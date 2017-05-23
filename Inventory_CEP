@@ -1,0 +1,28 @@
+#-----------------------------------------------------
+#Provide machine details - public or private cloud VMs
+#-----------------------------------------------------
+#Provide server ip to connect ansible through ssh. Password-less access preferred for security.
+[manager]
+10.66.96.66 ansible_ssh_user=user ansible_ssh_pass=password ansible_become=true ansible_become_method=sudo ansible_become_pass=password
+10.66.96.67 ansible_ssh_user=user ansible_ssh_pass=password ansible_become=true ansible_become_method=sudo ansible_become_pass=password
+10.66.96.68 ansible_ssh_user=user ansible_ssh_pass=password ansible_become=true ansible_become_method=sudo ansible_become_pass=password
+
+[worker]
+10.66.96.66 ansible_ssh_user=user ansible_ssh_pass=password ansible_become=true ansible_become_method=sudo ansible_become_pass=password
+10.66.96.67 ansible_ssh_user=user ansible_ssh_pass=password ansible_become=true ansible_become_method=sudo ansible_become_pass=password
+10.66.96.68 ansible_ssh_user=user ansible_ssh_pass=password ansible_become=true ansible_become_method=sudo ansible_become_pass=password
+10.66.96.69 ansible_ssh_user=user ansible_ssh_pass=password ansible_become=true ansible_become_method=sudo ansible_become_pass=password
+10.66.96.70 ansible_ssh_user=user ansible_ssh_pass=password ansible_become=true ansible_become_method=sudo ansible_become_pass=password
+
+[AllHosts:children]
+manager
+worker
+
+#---------------------------------------------------------------
+#set environment variable for https_proxy, http_proxy, no_proxy
+#---------------------------------------------------------------
+
+[AllHosts:vars]
+http_proxy="{{ lookup('env','http_proxy') }}"
+https_proxy="{{ lookup('env','https_proxy') }}"
+no_proxy="{{ lookup('env','no_proxy') }}"

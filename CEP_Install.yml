@@ -1,0 +1,144 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+#Get inputs from users to setup EVPaaS
+- hosts: 
+  - all
+  - localhost
+  
+  vars_prompt:
+  
+    - name: YumUpdate
+      prompt: "Do you want to Update Packages to latest - yes/no"
+      default: "no"
+      private: no 
+    
+    - name: DomainName
+      prompt: "Set Domain Name to access application/services(DNS should support *.domainname)"
+      default: "cepapp.dev"
+      private: no
+    
+    - name: DirectLVMstorage
+      prompt: "Is lvm setup for docker storage required"
+      default: "no"
+      private: no
+      
+    - name: Docker_storage_devs
+      prompt: "Disk path for docker storage setup (required if lvm setup is yes)"
+      default: "/dev/sdb"
+      private: no
+      
+    - name: cepfolder
+      prompt: "Specify an folder for cep config and data files (eg: /datadisk)"
+      private: no            
+ 
+    - name: cepUI
+      prompt: "Install EVFCEP Portal - Portainer - yes/no"
+      default: "yes"
+      private: no
+      
+    - name: cepmon
+      prompt: "Install Monitoring Service - Prometheus-Grafana - yes/no"
+      default: "yes"
+      private: no
+
+    - name: InstallGitlab
+      prompt: "Install Gitlab Service - yes/no"
+      default: "no"
+      private: no
+      
+    - name: cepGraylog
+      prompt: "Install Logging Service - Graylog - yes/no"
+      default: "yes"
+      private: no      
+    
+  tasks:
+    - set_fact: 
+        domainname: "{{DomainName}}"
+        cepfolder: "{{cepfolder}}"
+        installgitlab: "{{InstallGitlab}}" 
+        installcepui: "{{cepUI}}"
+        directLVMstorage: "{{DirectLVMstorage}}"
+        docker_storage_devs: "{{Docker_storage_devs}}"
+        installgraylog: "{{cepGraylog}}"
+        installmonitor: "{{cepmon}}"
+        yum_update: "{{YumUpdate}}"
+        
+
+#Generate certificates
+- hosts:
+  - localhost
+  
+  roles:
+    - cert_generation
+        
+#Install Docker engine in all machines
+- hosts:
+  - all
+  
+  roles:
+    - docker_storage
+    - certs
+    - install_docker
+    - app_config_setup
+    - { role: cadvisor, when: installmonitor == True or installmonitor == "yes"}
+
+#Determine swarm status for manager
+- hosts:
+  - manager
+  
+  roles:
+    - swarm_master_check
+    
+#Determine swarm status for worker
+- hosts:
+  - worker
+  
+  roles:
+    - swarm_worker_check
+
+- hosts:
+  - localhost    
+  
+  roles:
+    - swarm_master_list
+    - swarm_worker_list
+    
+#Initiate swarm if not already present
+- hosts:
+  - swarm_manager_bootstrap[0]
+  
+  roles:
+    - swarm_master_init
+
+#Retrieve swarm token
+- hosts: 
+  - swarm_manager_operational[0]
+
+  roles:
+    - swarm_retrieve_token
+      
+#Join swarm_masters
+- hosts:
+    - swarm_manager_bootstrap:!swarm_manager_operational
+    
+  roles:
+    - swarm_master_join
+
+#Join swarm workers
+- hosts:
+    - swarm_worker_bootstrap:!swarm_manager_bootstrap
+
+  roles:
+    - swarm_worker_join
+
+#Create services
+- hosts:
+    - swarm_manager_operational[0]
+
+  roles:
+    - router
+    - private_registry
+    - { role: cep_portal, when: installcepui == True or installcepui == "yes"}
+    - { role: gitlab, when: installgitlab == True or installgitlab == "yes"}
+    - { role: graylog, when: installgraylog == True or installgraylog == "yes"}
+    - { role: monitoring, when: installmonitor == True or installmonitor == "yes"}

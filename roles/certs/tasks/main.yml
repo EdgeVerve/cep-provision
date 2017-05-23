@@ -1,0 +1,86 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+#Install TLS certificates on all participating machines  
+
+- name: "Creates directory for TLS certificates"
+  file: path={{cepfolder}}/cep state=directory
+
+- name: "Creates directory for TLS certificates"
+  file: path={{cepfolder}}/cep/certificates state=directory
+
+- name: "copy generated TLS certificates in each swarm participant"
+  template: src={{item.src}} dest={{item.dest}}
+  with_items:
+    -
+      dest: "{{cepfolder}}/cep/certificates/ca.pem"
+      src: "SSLCertificates/{{domainname}}/ca.pem"
+    -
+      dest: "{{cepfolder}}/cep/certificates/cert.pem"
+      src: "SSLCertificates/{{domainname}}/cert.pem"
+    -
+      dest: "{{cepfolder}}/cep/certificates/key.pem"
+      src: "SSLCertificates/{{domainname}}/key.pem"
+    -
+      dest: "{{cepfolder}}/cep/certificates/haproxy.pem"
+      src: "SSLCertificates/{{domainname}}/haproxy.pem"
+      
+  when: (certgenneeded == "yes" or certgenneeded == True) or (use_validcert_only_for_haproxy == True)
+
+
+- name: "copy provided TLS certificates in each swarm participant"
+  template: "src={{item.src}} dest={{item.dest}} "
+  with_items:
+    -
+      dest: "{{cepfolder}}/cep/certificates/ca.pem"
+      src: "SSLCertificates/ca.pem"
+    -
+      dest: "{{cepfolder}}/cep/certificates/cert.pem"
+      src: "SSLCertificates/cert.pem"
+    -
+      dest: "{{cepfolder}}/cep/certificates/key.pem"
+      src: "SSLCertificates/key.pem"
+    -
+      dest: "{{cepfolder}}/cep/certificates/haproxy.pem"
+      src: "SSLCertificates/haproxy.pem"
+  when: (certgenneeded == "no" or certgenneeded == False) and (use_validcert_only_for_haproxy == False)
+  
+#Copy SSL Certificates into all machines
+- name: Creates directory for SSL certificates
+  file: path=/etc/docker/certs.d/{{registryname}} state=directory
+
+- name: copy domain.crt as ca.crt into /etc/docker/certs.d/{{registryname}} of each swarm node
+  template: src='SSLCertificates/{{domainname}}/ca.pem' dest=/etc/docker/certs.d/{{registryname}}/{{domainname}}.ca.crt
+  when: (certgenneeded == "yes" or certgenneeded == True)
+
+- name: copy domain.crt as ca.crt into /etc/docker/certs.d/{{registryname}} of each swarm node
+  template: src='SSLCertificates/ca.pem' dest=/etc/docker/certs.d/{{registryname}}/{{domainname}}.ca.crt
+  when: (certgenneeded == "no" or certgenneeded == False)  
+  
+- name: Creates directory for EVF Registry SSL certificates
+  file: path=/etc/docker/certs.d/{{ceppubregdomainname}} state=directory
+  when:  ("{{ceppubregip}}" != "")
+
+- name: copy domain.crt as ca.crt into /etc/docker/certs.d/{{ceppubregdomainname}} of each swarm node
+  template: src='sslcertificates/{{ceppubregdomainname}}.crt' dest=/etc/docker/certs.d/{{ceppubregdomainname}}/{{ceppubregdomainname}}.ca.crt
+  when: ("{{ceppubregip}}" != "")
+  
+- name: Make hosts file entry of swarm manager for each boxes
+  lineinfile: dest=/etc/hosts line="{{hostvars[item]['inventory_hostname']}}  machine-{{hostvars[item]['inventory_hostname'] |  regex_replace('\\.', '-') }}.{{domainname}}"
+  with_items:
+    - "{{  groups['manager'] }}"
+    - "{{  groups['worker'] }}"
+    
+- name: Install CA Certificates
+  yum:
+    name: ca-certificates
+    state: latest
+  environment:
+    http_proxy: "{{http_proxy}}"
+    https_proxy: "{{https_proxy}}" 
+    no_proxy: "{{no_proxy}}"  
+
+- name: copy CA certs bundle into docker deamon trusted certs - cp /etc/pki/tls/certs/ca-bundle.crt /etc/docker/certs.d/{{registryname}}/
+  command: cp /etc/pki/tls/certs/ca-bundle.crt /etc/docker/certs.d/{{registryname}}/ 
+
+
+   

@@ -1,0 +1,64 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: check if registry is already present
+  shell: "docker service ls | grep private_registry| wc -l"
+  register: existing_registry_op
+  ignore_errors: yes
+
+- name: create backup volume for registry
+  shell: docker volume create registry-backup
+  when: existing_registry_op.stdout == "0"
+  
+- name: spin registry container
+  shell: >
+         docker service create 
+         --name private_registry 
+         --network router_network
+         --mount target=/var/lib/registry,source=registry-backup,type=volume,volume-label="backup-type=registry",volume-label="backup=true"
+         --constraint "node.hostname == $HOSTNAME"
+         -e REGISTRY_HTTP_SECRET=secret
+         -e REGISTRY_LOG_LEVEL=debug
+         -e FORCE_SSL=yes 
+         -e SERVICE_PORTS="5000" 
+         -e VIRTUAL_HOST="https://registry.{{domainname}},registry.{{domainname}}"
+         {{ registry }}
+  when: existing_registry_op.stdout == "0"
+  
+- name : Pull app base images from cep registry - {{ceppubregdomainname}}
+  command: docker pull "{{ceppubregdomainname}}/{{ item.name }}:{{ item.tag }}"
+  with_items:
+    - { name: "{{public_alpine_node}}", tag: "{{public_node_tag}}" }
+    - { name: "{{public_alpine_node_git}}", tag: "{{public_node_git_tag}}" }
+    - { name: "{{public_alpine_mongo}}", tag: "{{public_mongo_tag}}" }
+ 
+- name: private registry entry in /etc/hosts of each node - {{  inventory_hostname }} {{registryname}}
+  lineinfile: dest=/etc/hosts line="{{ inventory_hostname }} {{registryname}}" state=present
+
+- name : tag base images
+  command: docker tag "{{ceppubregdomainname}}/{{ item.public_name }}:{{ item.public_tag }}" "{{registryname}}/{{ item.name }}:{{ item.tag }}"
+  with_items:
+    - { public_name: "{{public_alpine_node}}", public_tag: "{{public_node_tag}}", name: "{{alpine_node}}", tag: "{{node_tag}}" }
+    - { public_name: "{{public_alpine_node_git}}", public_tag: "{{public_node_git_tag}}", name: "{{alpine_node_git}}", tag: "{{node_git_tag}}" }
+    - { public_name: "{{public_alpine_mongo}}", public_tag: "{{public_mongo_tag}}", name: "{{alpine_mongo}}", tag: "{{mongo_tag}}" }  
+
+- name : push images to private registry - {{registryname}}
+  command: docker push "{{registryname}}/{{ item.name }}:{{ item.tag }}"
+  with_items:
+    - { name: "{{alpine_node}}", tag: "{{node_tag}}" }
+    - { name: "{{alpine_node_git}}", tag: "{{node_git_tag}}" }
+    - { name: "{{alpine_mongo}}", tag: "{{mongo_tag}}" }
+    
+    
+- name: clean up images in host machines
+  docker_image:
+    name: "{{ item.name }}"
+    tag: "{{ item.tag }}"
+    state: absent
+  with_items:
+    - { name: "{{registryname}}/{{alpine_node}}", tag: "{{node_tag}}" }
+    - { name: "{{registryname}}/{{alpine_node_git}}", tag: "{{node_git_tag}}" }
+    - { name: "{{registryname}}/{{alpine_mongo}}", tag: "{{mongo_tag}}" }
+    - { name: "{{ceppubregdomainname}}/{{public_alpine_node}}", tag: "{{public_node_tag}}" }
+    - { name: "{{ceppubregdomainname}}/{{public_alpine_node_git}}", tag: "{{public_node_git_tag}}" }
+    - { name: "{{ceppubregdomainname}}/{{public_alpine_mongo}}", tag: "{{public_mongo_tag}}" }
+  

@@ -1,0 +1,52 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: Create backup folder for gitlab
+  file: path={{cepfolder}}/cep/gitlab state=directory
+  when: installgitlab == True or installgitlab == "yes"
+  
+- name: Create prometheus folder for configuration
+  file: path={{cepfolder}}/cep/prometheus state=directory
+  when: installmonitor == True or installmonitor == "yes"
+
+- name: Create alertmanager folder for configuration
+  file: path={{cepfolder}}/cep/alertmanager state=directory
+  when: installmonitor == True or installmonitor == "yes"
+  
+- name: Create grafana folder for configuration
+  file: path={{cepfolder}}/cep/grafana/dashboards state=directory
+  when: installmonitor == True or installmonitor == "yes" 
+  
+- name: Copy config files
+  template: "src={{item.src}} dest={{item.dest}}"
+  with_items:
+    -
+      dest: "{{cepfolder}}/cep/prometheus/prometheus.conf"
+      src: "prometheus/prometheus.j2"
+    -
+      dest: "{{cepfolder}}/cep/prometheus/alert.rules"
+      src: "prometheus/alert.rules"
+    -
+      dest: "{{cepfolder}}/cep/alertmanager/alertmanager.conf"
+      src: "prometheus/alertmanager.conf"
+  when: installmonitor == True or installmonitor == "yes"
+
+- name: Copy grafana dashboards files
+  copy: "src={{item.src}} dest={{item.dest}}"
+  with_items:
+    -
+      dest: "{{cepfolder}}/cep/grafana/dashboards/docker-engine-metrics_rev2.json"
+      src: "roles/app_config_setup/templates/grafana/dashboards/docker-engine-metrics_rev2.json"
+    -
+      dest: "{{cepfolder}}/cep/grafana/dashboards/docker-swarm-container-overview_rev20.json"
+      src: "roles/app_config_setup/templates/grafana/dashboards/docker-swarm-container-overview_rev20.json"
+    -
+      dest: "{{cepfolder}}/cep/grafana/dashboards/machine_rev1.json"
+      src: "roles/app_config_setup/templates/grafana/dashboards/machine_rev1.json"
+    -
+      dest: "{{cepfolder}}/cep/grafana/dashboards/node-exporter-server-metrics_rev3.json"
+      src: "roles/app_config_setup/templates/grafana/dashboards/node-exporter-server-metrics_rev3.json"
+    -
+      dest: "{{cepfolder}}/cep/grafana/dashboards/node-exporter-single-server_rev5.json"
+      src: "roles/app_config_setup/templates/grafana/dashboards/node-exporter-single-server_rev5.json"
+  when: installmonitor == True or installmonitor == "yes"
+  

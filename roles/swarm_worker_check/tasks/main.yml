@@ -1,0 +1,33 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: determine swarm status
+  shell: "docker info | egrep '^Swarm: ' | cut -d ' ' -f2"
+  register: swarm_status
+
+- debug: msg="swarm_status - {{swarm_status.stdout_lines}}"
+
+- debug: msg="swarm_worker_operational_list.0 - {{swarm_worker_operational_list.0}}"
+- debug: msg="swarm_worker_bootstrap_list.0 - {{swarm_worker_bootstrap_list.0}}"
+
+- name: Add operational workers for populated swarm_worker_operational_list
+  set_fact:
+    swarm_worker_operational_list: "{{swarm_worker_operational_list}} + ['{{ansible_ssh_host}}']"
+  when: "('active' in swarm_status.stdout_lines) and (swarm_worker_operational_list.0|trim != '[')"
+  
+- name: Add operational workers for empty swarm_worker_operational_list
+  set_fact:
+    swarm_worker_operational_list: "['{{ansible_ssh_host}}']"
+  when: "('active' in swarm_status.stdout_lines) and (swarm_worker_operational_list.0|trim == '[')"
+  
+- name: Add bootstrap workers for populated swarm_worker_bootstrap_list
+  set_fact:
+    swarm_worker_bootstrap_list: "['{{ansible_ssh_host}}']"
+  when: "('inactive' in swarm_status.stdout_lines) and (swarm_worker_bootstrap_list.0|trim != '[')"
+  
+- name: Add bootstrap workers for empty swarm_worker_bootstrap_list
+  set_fact:
+    swarm_worker_bootstrap_list: "['{{ansible_ssh_host}}']"
+  when: "('inactive' in swarm_status.stdout_lines) and (swarm_worker_bootstrap_list.0|trim == '[')"
+  
+- debug: var=swarm_worker_operational_list
+- debug: var=swarm_worker_bootstrap_list

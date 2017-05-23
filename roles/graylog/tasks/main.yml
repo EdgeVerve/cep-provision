@@ -1,0 +1,23 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: check if graylog is already present
+  shell: "docker stack ls | grep cep_graylog"
+  register: existing_graylog_op
+  ignore_errors: yes
+  
+- name: Create graylog folder for docker compose file
+  file: path={{cepfolder}}/cep/graylog state=directory
+  when: existing_graylog_op.stdout == ""  
+
+- name: Register Master Host Name
+  shell: echo $HOSTNAME
+  register: master_hostname
+  when: existing_graylog_op.stdout == "" 
+
+- name: Copy graylog docker compose file
+  template: "src=graylog_docker_compose.j2 dest={{cepfolder}}/cep/graylog/docker-compose.yml"
+  when: existing_graylog_op.stdout == ""  
+
+- name: spin graylog container
+  shell: docker stack deploy -c {{cepfolder}}/cep/graylog/docker-compose.yml cep_graylog         
+  when: existing_graylog_op.stdout == ""

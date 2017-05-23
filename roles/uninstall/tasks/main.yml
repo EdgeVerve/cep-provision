@@ -1,0 +1,106 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: Removing all services
+  shell: "docker service rm $(docker service ls -q)"
+  ignore_errors: yes
+  
+- name: Removing all containers
+  shell: "docker rm -f $(docker ps -qa)"
+  ignore_errors: yes
+
+- name: Removing all images
+  shell: "docker rmi -f $(docker images -qa)"
+  ignore_errors: yes
+  
+- name: Removing all network
+  shell: "docker network rm $(docker network ls -f type=custom -q)"
+  ignore_errors: yes
+
+- name: Removing all volume
+  shell: "docker volume rm $(docker volume ls -q)"
+  ignore_errors: yes
+
+- name: Kill docker daemon
+  shell: "kill -9 $(pgrep -f dockerd)"
+  ignore_errors: yes
+
+
+- name: Remove docker yum repository
+  yum_repository:
+    name: docker
+    state: absent
+
+- name: Uninstall yum packages
+  yum: name={{item.name}} state=absent
+  with_items:
+    - { name: 'epel-release' }
+    - { name: 'docker-engine' }    
+
+
+- name: Unmount netns /run/docker folder
+  shell: umount -lR /run/docker/netns/* /run/docker/netns/
+  ignore_errors: yes
+  
+- name: Unmount cep folder if mounted
+  shell: umount -lR {{cepfolder}}/cep/ {{cepfolder}}/cep/*
+  when: directLVMstorage == True or directLVMstorage == "yes"
+  ignore_errors: yes
+  
+- name: Unmount /var/lib/docker folder if mounted
+  shell: umount -lR /var/lib/docker/* /var/lib/docker/devicemapper/mnt/* /var/lib/docker/ 
+  ignore_errors: yes
+
+- name: Kill cAdvisor process
+  shell: kill -9 `pgrep cadvisor` && systemctl stop cadvisor 
+  ignore_errors: yes
+  
+- name: Remove conf,certs,cep,docker data folder
+  file: path={{item.path}} state=absent
+  with_items:
+    - { path: '/etc/docker' }
+    - { path: '/var/lib/docker/network' }
+    - { path: '/etc/systemd/system/docker.service.d' }
+    - { path: '/run/docker' }
+    - { path: '/var/lib/docker' }
+    - { path: '{{cepfolder}}/cep' }
+    
+- name: remove logical volume
+  command: lvremove -y {{docker_storage_vg}}/docker-pool
+  when: directLVMstorage == True or directLVMstorage == "yes"
+  ignore_errors: yes
+  
+- name: remove datadisk logical volume
+  shell: "(fdisk -l) &&  (lvremove -y {{docker_storage_vg}}/datadisk)"
+  when: directLVMstorage == True or directLVMstorage == "yes"
+  ignore_errors: yes
+  
+- name: remove volume group
+  command: vgremove {{docker_storage_vg}}
+  when: directLVMstorage == True or directLVMstorage == "yes"
+  ignore_errors: yes
+  
+- name: remove docker-storage config  
+  file: path=/etc/sysconfig/docker-storage state=absent
+  when: directLVMstorage == True or directLVMstorage == "yes"
+  ignore_errors: yes
+  
+- name: Disable consul ports & SSL port in firewalld
+  firewalld: port={{item.port}} permanent=true state=disabled
+  with_items:
+    - { port: 80/tcp }
+    - { port: 443/tcp }
+    - { port: 2375/tcp }
+    - { port: 4000/tcp }
+    - { port: 7946/tcp }
+    - { port: 7946/udp }
+    - { port: 4789/tcp }
+    - { port: 4789/udp }
+    - { port: 9323/tcp }
+    - { port: 8080/tcp }
+    - { port: 12201/udp }
+    
+- name: Remove docker0 interface as trusted zone in firewalld
+  firewalld: zone=trusted interface=docker0 permanent=true state=disabled
+
+- name: restart firewalld
+  command: firewall-cmd --reload

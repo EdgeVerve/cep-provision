@@ -1,0 +1,7 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: join worker nodes to cluster
+  shell: >
+        docker swarm join
+        --token={{ hostvars[groups['swarm_manager_operational'][0]]['swarm_worker_token']['stdout'] }} --listen-addr=0.0.0.0:4000
+        {{ groups['swarm_manager_ips'][0] }}:4000

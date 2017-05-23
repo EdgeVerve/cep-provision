@@ -1,0 +1,31 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: gather swarm_manager_operational_list
+  set_fact:
+    swarm_manager_operational_list: "{{swarm_manager_operational_list}} +  {{ hostvars[item]['swarm_manager_operational_list'] }} "
+  when: "hostvars[item]['swarm_manager_operational_list'].0 != '['"
+  with_items:
+    - "{{  groups['manager'] }}"
+    
+- name: gather swarm_manager_bootstrap_list
+  set_fact:
+    swarm_manager_bootstrap_list: "{{swarm_manager_bootstrap_list}} +  {{ hostvars[item][\"swarm_manager_bootstrap_list\"] }} "
+  when: "hostvars[item]['swarm_manager_bootstrap_list'].0 != '['"
+  with_items:
+    - "{{  groups['manager'] }}"
+    
+
+- debug: msg="swarm_manager_operational_list - {{swarm_manager_operational_list}}"
+- debug: msg="swarm_manager_bootstrap_list - {{swarm_manager_bootstrap_list}}"
+  
+- name: create swarm_manager_bootstrap group
+  include: roles/common/handlers/main.yml
+  vars:
+    group_to_include: swarm_manager_bootstrap
+    list_to_include: "{{ swarm_manager_bootstrap_list | list}}"
+  
+- name: create swarm_manager_operational group
+  include: roles/common/handlers/main.yml
+  vars:
+    group_to_include: swarm_manager_operational
+    list_to_include: "{{ swarm_manager_operational_list | list}}"

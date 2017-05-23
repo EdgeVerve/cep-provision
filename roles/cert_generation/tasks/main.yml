@@ -1,0 +1,25 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+#Generate TLS certificates
+# If alternate IP is needed, script takes -i with List of IP in comma separated format.
+
+- name: create SSLCertificates/{{domainname}} folder if not exists
+  file: "path=SSLCertificates/{{domainname}} state=directory "
+  
+- name: Generate haproxy.pem for provided certs
+  shell: "cat SSLCertificates/cert.pem SSLCertificates/key.pem SSLCertificates/ca.pem> SSLCertificates/{{domainname}}/haproxy.pem"
+  when: (certgenneeded == "no" or certgenneeded == False)
+
+- name: Run certificate generation script
+  shell: sh roles/cert_generation/templates/gen-tls-certificate.sh -t "SSLCertificates/{{domainname}}/" -d "{{subjectAltNameDNS}}" -c "roles/cert_generation/templates/" -e "{{hostvars[groups['manager'][0]]['inventory_hostname'] | regex_replace('\\.', '-')}}"
+  register: shout
+  when: ((certgenneeded == "yes" or certgenneeded == True) or (use_validcert_only_for_haproxy == True))
+   
+- debug: msg="{{ shout.stdout_lines }}"  
+- debug: msg="{{ shout.stderr }}"
+
+-
+  name: Generate haproxy.pem for generated certs
+  shell: "cat SSLCertificates/{{domainname}}/cert.pem SSLCertificates/{{domainname}}/key.pem SSLCertificates/{{domainname}}/ca.pem> SSLCertificates/{{domainname}}/haproxy.pem"
+  when: (certgenneeded == "yes" or certgenneeded == True) 
+

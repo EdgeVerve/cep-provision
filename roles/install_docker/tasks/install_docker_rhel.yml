@@ -1,0 +1,146 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: Yum Update   
+  yum:
+    name: '*'
+    state: latest      
+  environment:
+    http_proxy: "{{http_proxy}}"
+    https_proxy: "{{https_proxy}}" 
+    no_proxy: "{{no_proxy}}"
+  when: (yum_update == True or yum_update == "yes")
+
+- name: Add docker repo
+  yum_repository:
+    name: docker
+    description: Docker Repository
+    baseurl: https://yum.dockerproject.org/repo/main/centos/7/
+    gpgcheck: yes
+    gpgkey: https://yum.dockerproject.org/gpg
+    enabled: yes
+  environment:
+    http_proxy: "{{http_proxy}}"
+    https_proxy: "{{https_proxy}}" 
+    no_proxy: "{{no_proxy}}"
+  
+- name: Add epel repo
+  yum_repository:
+    name: epel
+    description: epel release Repository
+    baseurl: http://download.fedoraproject.org/pub/epel/7/$basearch
+    gpgcheck: yes
+    gpgkey: http://download.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
+    enabled: yes
+  environment:
+    http_proxy: "{{http_proxy}}"
+    https_proxy: "{{https_proxy}}" 
+    no_proxy: "{{no_proxy}}"
+
+- name: make sure epel-release is installed
+  yum:
+    name: "{{item.name}}"
+    state: present
+    disablerepo: "*"
+    enablerepo: epel
+  with_items:
+    #- { name: 'epel-release' }
+    - { name: 'python-pip' }      
+  environment:
+    http_proxy: "{{http_proxy}}"
+    https_proxy: "{{https_proxy}}"
+    no_proxy: "{{no_proxy}}"
+
+- name: Install docker Pre-Requisite - docker-py
+  pip:
+    name: "{{item.name}}"
+    state: latest
+    #version: "{{item.version}}"
+  with_items:
+    - { name: 'docker-py'}
+    - { name: 'pyYAML'}
+    #- { name: 'docker-compose'}
+  environment:
+    http_proxy: "{{http_proxy}}"
+    https_proxy: "{{https_proxy}}" 
+    no_proxy: "{{no_proxy}}"
+  
+- name: "Install docker engine"
+  yum: 
+    name: docker-engine
+    state: present
+  environment:
+    http_proxy: "{{http_proxy}}"
+    https_proxy: "{{https_proxy}}" 
+    no_proxy: "{{no_proxy}}"
+
+- name: create {{cepfolder}}/cep/docker folder
+  file: path={{cepfolder}}/cep/docker state=directory 
+
+- name: "Copy daemon json to machine for lvm"
+  template: src='rhel_daemon_lvm.json' dest='{{cepfolder}}/cep/docker/daemon.json'
+  when: directLVMstorage == True or directLVMstorage == "yes"
+  
+- name: "Copy daemon json to machine without lvm"
+  template: src='rhel_daemon.json' dest='{{cepfolder}}/cep/docker/daemon.json'
+  when: directLVMstorage == False or directLVMstorage == "no"
+  
+- name: Enable docker ports in firewalld
+  firewalld: port={{item.port}} permanent=true state=enabled
+  with_items:
+    - { port: 80/tcp }
+    - { port: 443/tcp }
+    - { port: 2375/tcp }
+    - { port: 4000/tcp }
+    - { port: 7946/tcp }
+    - { port: 7946/udp }
+    - { port: 4789/tcp }
+    - { port: 4789/udp }
+    - { port: 12201/udp } #graylog udp port
+    - { port: 9323/tcp } #docker metrics port
+    - { port: 8080/tcp } #cadvisor port
+  register: firewalld_op
+    
+- name: Add docker0 interface as trusted zone in firewalld
+  firewalld: zone=trusted interface=docker0 permanent=true state=enabled
+
+- name: restart firewalld
+  command: firewall-cmd --reload
+  when: firewalld_op | changed
+  
+- name: waiting for ssh port to get active
+  local_action: wait_for port=22 host="{{ inventory_hostname }}" search_regex=OpenSSH delay=5 timeout=60
+  
+- name: Creates directory for docker configuration file
+  file: path=/etc/systemd/system/docker.service.d state=directory      
+      
+- name: create folder for docker conf files
+  file: path={{cepfolder}}/cep/docker state=directory
+
+- name: update docker Configuration - docker.conf
+  template: src='docker.conf' dest='/etc/systemd/system/docker.service.d/docker.conf'
+  register: docker_conf_op
+
+- name: Enable proxy to access images from docker public repo (consul only)
+  template: src='http-proxy.conf' dest='/etc/systemd/system/docker.service.d/http-proxy.conf'
+  when: enabledockerhub == True or enabledockerhub == "yes"
+  register: docker_proxy_op
+      
+- name:  make entry in /etc/hosts of each node - {{ceppubregip}} {{ceppubregdomainname}}
+  lineinfile: dest=/etc/hosts line="{{ceppubregip}} {{ceppubregdomainname}}"
+  when: ("{{ceppubregip}}" != "")
+
+- name: Reload systemd
+  command: systemctl daemon-reload
+  when: (docker_proxy_op | changed) or (docker_conf_op | changed)
+   
+- name: service restart docker daemon
+  service: name=docker state=restarted enabled=yes
+  when: (docker_proxy_op | changed) or (docker_conf_op | changed)
+  
+- name: service start docker daemon
+  service: name=docker state=started enabled=yes
+
+- name: Add login for public registry
+  command: "docker login -u {{ceppubreguser}} -p {{ceppubregpass}} {{ceppubregdomainname}}"
+  when: ("{{ceppubreguser}}" != "")
+    

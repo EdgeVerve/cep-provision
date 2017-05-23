@@ -1,0 +1,37 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: check if node-exporter is already present
+  shell: "docker service ls | grep cep-node-exporter | wc -l"
+  register: existing_node_exporter_op
+  ignore_errors: yes
+  
+- name: spin node-exporter container globally
+  include: node-exporter.yml
+  when: existing_node_exporter_op.stdout == "0"
+
+- name: check if Alertmanager is already present
+  shell: "docker service ls | grep cep-alertmanager| wc -l"
+  register: existing_am_op
+  ignore_errors: yes
+
+- name: Setup Alertmanager
+  include: alertmanager.yml
+  when: existing_am_op.stdout == "0"
+        
+- name: check if prometheus is already present
+  shell: "docker service ls | grep cep-prometheus-server| wc -l"
+  register: existing_prom_op
+  ignore_errors: yes
+
+- name: Setup prometheus
+  include: prometheus.yml
+  when: existing_prom_op.stdout == "0"
+  
+- name: check if grafana is already present
+  shell: "docker service ls | grep cep-grafana-server| wc -l"
+  register: existing_grafana_op
+  ignore_errors: yes
+  
+- name: Setup grafana
+  include: grafana.yml
+  when: existing_grafana_op.stdout == "0"

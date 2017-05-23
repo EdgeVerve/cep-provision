@@ -1,0 +1,41 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- hosts:
+  - all
+  
+  vars_prompt:
+      
+    - name: CONFIRM
+      prompt: "THIS PLAY WIPES OUT CEP COMPONENTS ALONG WITH PERSISTED DATA - Say yes to continue"
+      private: no
+      default: "no"
+
+    - name: DomainName
+      prompt: "Set Domain Name to access application/services(DNS should support *.domainname)"
+      default: "cepapp.dev"
+      private: no
+      
+    - name: cepfolder
+      prompt: "Specify the folder used for cep config files and Docker data (eg: /datadisk)"
+      private: no
+      
+    - name: DirectLVMstorage
+      prompt: "Is lvm setup for docker storage"
+      default: "no"
+      private: no
+      
+  pre_tasks:
+    - set_fact:
+        domainname: "{{DomainName}}"
+        cepfolder: "{{cepfolder}}"
+        directLVMstorage: "{{DirectLVMstorage}}"
+        
+    - stat: path={{cepfolder}}
+      register: p
+    - debug: msg="Folder Path {{cepfolder}} exists and is a directory"
+      when: p.stat.isdir is defined and p.stat.isdir
+    - fail: msg="Folder {{cepfolder}} does not exists"
+      when: p.stat.isdir is not defined and p.stat.isdir == False
+      
+  roles:
+    - { role: uninstall,  when: CONFIRM == True or CONFIRM == "yes" }

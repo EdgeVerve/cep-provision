@@ -1,0 +1,82 @@
+#-----------------
+#Global variables
+#-----------------
+registryname: "registry.{{domainname}}" #URL of the private registry to be created inside CEP
+ceppubregdomainname: "docker.io" #registry being used to pull CEP component images
+ceppubregip: "" #If host entry is needed to pull CEP component images
+ceppubreguser: "" #If registry login (username) is needed to pull CEP component images
+ceppubregpass: ""  #If registry login (password) is needed to pull CEP component images
+enabledockerhub: yes #Enable proxy in docker daemon
+certgenneeded: yes #If self-signed certificate generation is needed, if no please provide certificates in /roles/certs/templatesSSLCertificates/{{domainname}}/
+use_validcert_only_for_haproxy: yes #If set to yes, certificates provided/generated will be used only for haproxy (ssl termination)
+
+#---------------------------------------------------
+# Bases Images from public registry to setup EVPaaS 
+#---------------------------------------------------
+router: "{{ceppubregdomainname}}/dockercloud/haproxy:1.6.6"
+paasui: "{{ceppubregdomainname}}/portainer/portainer:1.12.4"
+registry: "{{ceppubregdomainname}}/registry:2.6.1"
+node_exporter: "{{ceppubregdomainname}}/prom/node-exporter:v0.14.0"
+prometheus: "{{ceppubregdomainname}}/prom/prometheus:v1.6.3"
+grafana: "{{ceppubregdomainname}}/grafana/grafana:4.2.0"
+alertmanager: "{{ceppubregdomainname}}/prom/alertmanager:v0.6.2"
+
+#---------------------------------------------------------------------
+# Base Images required in private registry for Application deployment
+#---------------------------------------------------------------------
+public_alpine_node: "mhart/alpine-node"
+public_node_tag: 7
+public_alpine_node_git: "fusioncomau/alpine-node-git"
+public_node_git_tag: 7
+public_alpine_mongo: "mvertes/alpine-mongo"
+public_mongo_tag: "3.4.4-0"
+alpine_node: "alpine-node"
+node_tag: latest
+alpine_node_git: "alpine-node-git"
+node_git_tag: latest
+alpine_mongo: "alpine-mongo"
+mongo_tag: latest
+#cep_executor: "cep-executor"
+#cep_executor_tag: latest
+
+#-----------------------------
+#Images for optional features 
+#-----------------------------
+alpine_gitlab_runner: "{{ceppubregdomainname}}/gitlab/gitlab-runner"
+gitlab: "{{ceppubregdomainname}}/gitlab/gitlab-ce"
+graylog: "{{ceppubregdomainname}}/graylog/graylog:2.2"
+graylogdb: "{{ceppubregdomainname}}/{{public_alpine_mongo}}:{{public_mongo_tag}}"
+graylogelastic: "{{ceppubregdomainname}}/elasticsearch:1-alpine"
+graylog_secret: "somepasswordpepper"
+graylog_password_hash: "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
+
+#---------------------------------------------------------------
+#Alternative IP/DNS for certificate generation
+#---------------------------------------------------------------
+subjectAltNameDNS: "*.{{domainname}}"
+
+#---------------------------------------------------------------
+#Docker storage parameters
+#---------------------------------------------------------------
+docker_storage_storage_driver: "devicemapper"
+docker_storage_vg: "vgpool"
+docker_storage_data_size: "40%VG"
+docker_storage_min_data_size: "2G"
+docker_storage_chunk_size: "512K"
+docker_storage_growpart: "false"
+docker_storage_auto_extend_pool: "yes"
+docker_storage_pool_autoextend_threshold: "80"
+docker_storage_pool_autoextend_percent: "20"
+docker_storage_device_wait_timeout: "60"
+docker_storage_wipe_signatures: "true"
+docker_storage_datadisk_size: "40%VG"
+docker_storage_datadisk_name: "datadisk"
+docker_storage_datadisk_path: "{{cepfolder}}/cep/"
+
+#---------------------------------------------------------------
+#Variable Initialization
+#---------------------------------------------------------------
+swarm_manager_operational_list: "['']" #Initiation of variable
+swarm_manager_bootstrap_list: "['']" #Initiation of variable
+swarm_worker_operational_list: "['']" #Initiation of variable
+swarm_worker_bootstrap_list: "['']" #Initiation of variable

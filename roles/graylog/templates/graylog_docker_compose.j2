@@ -1,0 +1,45 @@
+version: "3"
+
+services:
+  elasticsearch:
+    image: {{ graylogelastic }}
+    command: elasticsearch -Des.cluster.name="graylog"
+    networks:
+      - graylog
+      - router_network
+
+  mongo:
+    image: {{ graylogdb }}
+    networks:
+      - graylog
+
+  graylog_server:
+    image: {{ graylog }}
+    depends_on:
+      - mongo
+      - elasticsearch
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - "node.hostname == {{master_hostname.stdout}}"
+    environment:
+      GRAYLOG_PASSWORD_SECRET: {{graylog_secret}}
+      GRAYLOG_ROOT_PASSWORD_SHA2: {{graylog_password_hash}}
+      GRAYLOG_WEB_ENDPOINT_URI: "https://graylog.{{ domainname }}/api/"
+      SERVICE_12201_NAME: graylog-udp
+      SERVICE_9000_NAME: graylog
+      SERVICE_PORTS: "9000"
+      VIRTUAL_HOST: "https://graylog.{{domainname}},graylog.{{domainname}}"
+    networks:
+      - graylog
+      - router_network
+    ports:
+      - "9000:9000"
+      - "12201:12201/udp"
+         
+networks:
+    graylog:
+    router_network:
+      external: true

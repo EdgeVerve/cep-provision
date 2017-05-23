@@ -1,0 +1,41 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+#Setup gitlab runner(s) within swarm provided gitlab details
+#no_proxy: 10.73.53.167,10.188.25.62,10.73.74.175,10.73.74.177,10.73.74.80,10.73.74.176,evgit,10.73.96.137
+
+- name: check if gitlab is already present
+  shell: "docker service ls | grep cep_gitlab_runner | wc -l"
+  register: existing_gitlabrunner_op
+  ignore_errors: yes
+
+- name: spin gitlab runner service
+  shell: >
+         docker service create 
+         --name cep_gitlab_runner
+         --mount target=/var/run/docker.sock,source=/var/run/docker.sock,type=bind
+         -e URL="{{ gitrunner_gitlaburl }}" 
+         -e TOKEN="{{ gitrunner_regtoken }}" 
+         -e DESCRIPTION="evgitlab_runner" 
+         -e REGISTRY="{{ registryname }}"
+         -e BASE_IMAGE="node-docker-ansible"
+         -e TAGS="{{ gitrunner_tag }}" 
+         -e http_proxy="{{ http_proxy }}" 
+         -e https_proxy="{{ https_proxy }}" 
+         -e no_proxy="{{ no_proxy }}"
+         -e HTTP_PROXY="{{ http_proxy }}" 
+         -e HTTPS_PROXY="{{ https_proxy }}"
+         -e NO_PROXY="{{ no_proxy }}"
+         -e BUILD_HOST="{{ inventory_hostname }}:2375"
+         -e PUSH_HOST="{{ inventory_hostname }}:2375" 
+         -e PAAS_HOST="{{ inventory_hostname }}" 
+         -e host_ip="{{ inventory_hostname }}"
+         -e DOCKER_PORT="2375"
+         -e DOMAIN_NAME="{{ domainname }}"
+         -e SSH_PATH="{{cepfolder}}/cep/evgitssh"
+         {{ alpine_gitlab_runner }}
+  when: existing_gitlabrunner_op.stdout == "0"
+
+- name: gitlab runner scale to required number
+  shell: docker service scale gitlab-runner={{gitrunner_instances}}
+  
+  

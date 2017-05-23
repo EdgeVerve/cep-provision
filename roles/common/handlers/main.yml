@@ -1,0 +1,15 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: Add host in group
+  add_host:
+    hostname: "{{ item }}"
+    ansible_ssh_host: "{{ hostvars[item]['inventory_hostname'] }}"
+    ansible_ssh_user: "{{ hostvars[item]['ansible_ssh_user'] }}"
+    ansible_ssh_pass: "{{ hostvars[item]['ansible_ssh_pass'] | default('')}}"
+    ansible_become: "{{ hostvars[item]['ansible_become'] | default('')}}"
+    ansible_become_method: "{{ hostvars[item]['ansible_become_method'] | default('')}}"
+    ansible_become_pass: "{{ hostvars[item]['ansible_become_pass'] | default('')}}"
+    groups: "{{ group_to_include }}"
+  when: hostvars[item] is defined and hostvars[item]['inventory_hostname'] is defined
+  with_items:  
+    - "{{ list_to_include }}"

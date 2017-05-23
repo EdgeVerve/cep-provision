@@ -1,0 +1,30 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: retrieve swarm manager token
+  shell: docker swarm join-token -q manager
+  register: swarm_manager_token
+
+- name: retrieve swarm worker token
+  shell: docker swarm join-token -q worker
+  register: swarm_worker_token
+
+- name: populate list of manager ips
+  add_host:
+    hostname: "{{ item }}"
+    groups: swarm_manager_ips
+  with_items: "{{ play_hosts }}"
+  
+- debug: msg="swarm_manager_bootstrap - {{groups['swarm_manager_bootstrap']}}"
+  ignore_errors: yes
+  
+- debug: msg="swarm_manager_operational - {{groups['swarm_manager_operational']}}"
+  ignore_errors: yes
+  
+- debug: msg="swarm_manager_ips - {{groups['swarm_manager_ips']}}"
+  ignore_errors: yes
+  
+- debug: msg="swarm_manager_token - {{swarm_manager_token}}"
+  ignore_errors: yes
+  
+- debug: msg="swarm_worker_token - {{swarm_worker_token}}"
+  ignore_errors: yes

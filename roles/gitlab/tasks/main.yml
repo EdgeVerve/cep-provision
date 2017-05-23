@@ -1,0 +1,31 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: check if gitlab is already present
+  shell: "docker service ls | grep cep_gitlab | wc -l"
+  register: existing_gitlab_op
+
+- name: create backup volume for gitlab
+  shell: docker volume create gitlab-backup
+  when: existing_registry_op.stdout == "0"
+
+- name: create {{cepfolder}}/cep/gitlab/secret_backup folder
+  file: path={{cepfolder}}/cep/gitlab/secret_backup state=directory 
+  
+- name: create {{cepfolder}}/cep/gitlab/opt_gitlabfolder
+  file: path={{cepfolder}}/cep/gitlab/opt_gitlab state=directory 
+
+- name: spin a single instance of gitlab in swarm
+  shell: >
+         docker service create 
+         --name cep_gitlab 
+         --network router_network 
+         --mount target=/var/opt/gitlab,source={{cepfolder}}/cep/gitlab/opt_gitlab,type=bind
+         --mount target=/secret/gitlab/backups,source={{cepfolder}}/cep/gitlab/secret_backup,type=bind
+         --constraint "node.hostname == $HOSTNAME"
+         -e SERVICE_PORTS="80" 
+         -e FORCE_SSL=yes 
+         -e VIRTUAL_HOST="https://gitlab.{{domainname}},gitlab.{{domainname}}" 
+         --host gitlab.{{domainname}}:{{inventory_hostname}}
+         -e GITLAB_OMNIBUS_CONFIG="nginx['enable'] = true;nginx['listen_port'] = 80;nginx['listen_https'] = false;nginx['proxy_set_headers'] = {'X-Forwarded-Proto' => 'https','X-Forwarded-Ssl' => 'on'};external_url 'http://gitlab.{{domainname}}'"  
+         {{ gitlab }}
+  when: existing_gitlab_op.stdout == "0"

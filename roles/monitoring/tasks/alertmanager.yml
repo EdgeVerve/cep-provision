@@ -1,0 +1,11 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: spin alertmanager container
+  shell: >
+         docker service create
+         --name cep-alertmanager
+         --network router_network 
+         --mount target=/config,source={{cepfolder}}/cep/alertmanager,type=bind
+         -e SERVICE_PORTS="9093" 
+         -e VIRTUAL_HOST="https://alertmanager.{{domainname}},alertmanager.{{domainname}}" 
+         {{ alertmanager }}

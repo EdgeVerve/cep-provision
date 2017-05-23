@@ -1,0 +1,18 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: initialize swarm cluster
+  shell: docker swarm init --advertise-addr={{ ansible_ssh_host }}:4000 --listen-addr=0.0.0.0:4000
+  when: "'swarm_manager_operational' not in groups"
+  register: bootstrap_first_node
+
+- name: add initialized host play_hosts[0] to swarm_manager_operational group
+  add_host:
+    hostname: "{{ play_hosts[0] }}"
+    ansible_ssh_host: "{{ hostvars[play_hosts[0]]['inventory_hostname'] }}"
+    ansible_ssh_user: "{{ hostvars[play_hosts[0]]['ansible_ssh_user'] }}"
+    ansible_ssh_pass: "{{ hostvars[play_hosts[0]]['ansible_ssh_pass'] }}"
+    ansible_become: "{{ hostvars[play_hosts[0]]['ansible_become'] }}"
+    ansible_become_method: "{{ hostvars[play_hosts[0]]['ansible_become_method'] }}"
+    ansible_become_pass: "{{ hostvars[play_hosts[0]]['ansible_become_pass'] }}"
+    groups: swarm_manager_operational
+  when: bootstrap_first_node | changed

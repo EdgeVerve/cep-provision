@@ -1,0 +1,16 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: spin prometheus container
+  shell: >
+         docker service create
+         --name cep-prometheus-server
+         --network router_network 
+         --mount target=/config,source={{cepfolder}}/cep/prometheus,type=bind
+         -e FORCE_SSL=yes 
+         -e SERVICE_PORTS="9090" 
+         -e VIRTUAL_HOST="https://prometheus.{{domainname}},prometheus.{{domainname}}" 
+         {{ prometheus }}
+         -config.file=/config/prometheus.conf 
+         -web.console.templates=/usr/share/prometheus/consoles 
+         -web.console.libraries=/usr/share/prometheus/console_libraries
+         -alertmanager.url=http://cep-alertmanager:9093

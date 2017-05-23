@@ -1,0 +1,15 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+
+- name: spin grafana service
+  shell: >
+         docker service create 
+         --mount target=/var/lib/grafana,source={{cepfolder}}/cep/grafana,type=bind
+         -e FORCE_SSL=yes 
+         -e SERVICE_PORTS="3000" 
+         -e VIRTUAL_HOST="https://grafana.{{domainname}},grafana.{{domainname}}" 
+         -e "GF_SERVER_ROOT_URL=https://grafana.{{domainname}}" 
+         -e "PROMETHEUS_ENDPOINT=http://prometheus-server:9090" 
+         --network router_network 
+         --name cep-grafana-server 
+         {{ grafana }}

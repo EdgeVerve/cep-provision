@@ -1,0 +1,9 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: spin node-exporter container globally
+  shell: >
+        docker service create 
+        --name cep-node-exporter 
+        --mode global 
+        -p 9100:9100 
+        {{ node_exporter }}

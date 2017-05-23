@@ -1,0 +1,5 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: Install Docker pre-requisites with docker-engine in rhel
+  include: install_docker_rhel.yml
+  when: ansible_os_family == 'RedHat'

@@ -1,0 +1,33 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: Make folder for docker-storage-setup file
+  file: "path={{cepfolder}}/cep/docker-storage-setup state=directory"
+  when: directLVMstorage == True or directLVMstorage == "yes"
+  
+- name: Copy required files
+  template: "src={{item.src}} dest={{item.dest}} "
+  with_items:
+    -
+      dest: "{{cepfolder}}/cep/docker-storage-setup/docker-storage-setup.conf"
+      src: "rhel_setup/docker-storage-setup.conf"
+    -
+      dest: "{{cepfolder}}/cep/docker-storage-setup/docker-storage-setup.sh"
+      src: "rhel_setup/docker-storage-setup.sh"
+    -
+      dest: "{{cepfolder}}/cep/docker-storage-setup/dss-child-read-write.sh"
+      src: "rhel_setup/dss-child-read-write.sh"
+    - 
+      dest: "{{cepfolder}}/cep/docker-storage-setup/libdss.sh"
+      src: "rhel_setup/libdss.sh"
+  when: directLVMstorage == True or directLVMstorage == "yes"
+     
+- name: Execute docker-storage-setup script
+  shell: "sh {{cepfolder}}/cep/docker-storage-setup/docker-storage-setup.sh"
+  register: shout
+  when: directLVMstorage == True or directLVMstorage == "yes"
+  
+- debug: msg="{{ shout.stdout_lines }}"  
+  when: directLVMstorage == True or directLVMstorage == "yes"
+
+- debug: msg="{{ shout.stderr }}"
+  when: directLVMstorage == True or directLVMstorage == "yes"

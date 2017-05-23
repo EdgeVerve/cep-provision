@@ -1,0 +1,10 @@
+[Unit]
+Description=CAdvisor Service
+ 
+[Service]
+ExecStart={{cepfolder}}/cep/cAdvisor/cadvisor/cadvisor
+StandardOutput=null
+ 
+[Install]
+WantedBy=multi-user.target
+Alias=cadvisor.service
