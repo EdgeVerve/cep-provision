@@ -97,14 +97,15 @@ ansible-playbook --flush-cache CEP_Install.yml -i Inventory_CEP -c paramiko
 It will ask for inputs. Here's the description of each question it asks 
 
 * *Do you want to perform Yum Update - yes/no [no]*: In general the recommendation is to say yes. This ensures that you have latest updates installed from RHEL/CentOS. If you have certain guidelines from your network admin you can chose to say no.
-* *Set Domain Name to access application/services(DNS should support *.domainname) [cepapp.dev]*: This is the subdomain you are going to use to access the services hosted on CEP. e.g. if you give cepapp.qa as input, the applications you deploy on the CEP will be accessible as https://application.cepapp.qa . You need to ensure that there's a DNS entry made to resolve *.cepapp.qa to the IP of the Pilot Machine. If you can't make an entry in the DNS servers, then you'd need to use host file entries to resolve the domain names correctly from the client machines.
-* *Specify an folder for CEP config files and Docker data (eg: /datadisk)*: This is the folder on which CEP config files and data will be stored.
-* *Install Gitlab - yes/no [no]*: This can help you install gitlab as a service.
-* *Install CEP Portal - Portainer - yes/no [no]*: This can help in container management like check service logs etc.
+* *Set Domain Name to access application/services(DNS should support \*.domainname) [cepapp.dev]*: This is the subdomain you are going to use to access the services hosted on CEP. e.g. if you give cepapp.qa as input, the applications you deploy on the CEP will be accessible as https://application.cepapp.qa . You need to ensure that there's a DNS entry made to resolve *.cepapp.qa to the IP of the Pilot Machine. If you can't make an entry in the DNS servers, then you'd need to use host file entries to resolve the domain names correctly from the client machines.
 * *Docker storage lvm setup required [no]*: By default you can use any kind of storage for docker daemon to store it's files,the recommendation is to have a lvm storage. The Ansible script can create a lvm storage from unmounted space for you.
-* *Docker storage setup required [/dev/sdb]*: The ansible will convert the unmounted space to lvm storage and configure the docker daemon to use it. Specify unmounted storage path 
+* *Docker storage setup required [/dev/sdb]*: The ansible will convert the unmounted space to lvm storage and configure the docker daemon to use it. Specify unmounted storage path
+* *Specify an folder for CEP config files and Docker data (eg: /datadisk)*: This is the folder on which CEP config files and data will be stored. 
+* *Install CEP Portal - Portainer - yes/no [no]*: This can help in container management like check service logs etc.
+
 * *Install Monitoring Service - Prometheus-Grafana*: This will setup monitoring for your environment.
-* *Install Gitlab Service*: This will setup logging for your environment.
+* *Install Gitlab Service - yes/no [no]*: This can help you install gitlab as a service.
+* *Install Logging Service - Graylog - yes/no[no]*: This will setup graylog for your environment as a centralized logging server.
 
 Provide responses for the prompts. To run as a single command instead of interactive prompts, use the below command with preset inputs.
 
