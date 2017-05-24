@@ -118,3 +118,5 @@ The project is licensed under MIT License, See [LICENSE](./LICENSE) for more det
 We welcome contributions. Some of the best ways to contribute are to try things out, file bugs, and join in design conversations. 
 
 ### [How to contribute](./CONTRIBUTION.md)
+
+### [Report an issue](https://github.com/EdgeVerve/cep-provision/issues)
