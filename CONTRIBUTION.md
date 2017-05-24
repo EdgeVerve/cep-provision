@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for your interest in oe.io, an open source project administered by EdgeVerve.
+Thank you for your interest in CEP, an open source project administered by EdgeVerve.
 
 
 ## Raising issues
