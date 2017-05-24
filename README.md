@@ -108,8 +108,7 @@ ansible-playbook --flush-cache CEP_Uninstall.yml -i Inventory_CEP --extra-vars "
 ```
 
 ## More information
-Wiki pages will be added soon.
-
+Please visit [oeCloud.io](https://www.oecloud.io)
 
 ## License
 The project is licensed under MIT License, See [LICENSE](./LICENSE) for more details.
