@@ -127,7 +127,7 @@
       
 - name:  make entry in /etc/hosts of each node - {{ceppubregip}} {{ceppubregdomainname}}
   lineinfile: dest=/etc/hosts line="{{ceppubregip}} {{ceppubregdomainname}}"
-  when: ("{{ceppubregip}}" != "")
+  when: ceppubregip != ""
 
 - name: Reload systemd
   command: systemctl daemon-reload
@@ -142,5 +142,5 @@
 
 - name: Add login for public registry
   command: "docker login -u {{ceppubreguser}} -p {{ceppubregpass}} {{ceppubregdomainname}}"
-  when: ("{{ceppubreguser}}" != "")
+  when: ceppubreguser != ""
     

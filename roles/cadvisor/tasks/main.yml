@@ -5,12 +5,11 @@
 - name: create {{cepfolder}}/cep/cAdvisor folder
   file: path={{cepfolder}}/cep/cAdvisor state=directory 
     
-- name: Copy cadvisor zip
-  copy: src=roles/cadvisor/templates/cadvisor.zip dest={{cepfolder}}/cep/cAdvisor 
-
-- name: Unzip cadvisor
-  shell: "unzip -o {{cepfolder}}/cep/cAdvisor/cadvisor.zip -d {{cepfolder}}/cep/cAdvisor/"
-  
+- name: unarchive cadvisor
+  unarchive:
+    src: "roles/cadvisor/templates/cadvisor.zip"
+    dest: "{{cepfolder}}/cep/cAdvisor/"
+      
 - name: Copy cadvisor service file
   template: src=cadvisor.service dest=/usr/lib/systemd/system/
   register: cadvisor_service_file_changed

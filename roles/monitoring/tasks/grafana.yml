@@ -1,5 +1,9 @@
 #©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
 
+- name: unarchive grafana data files
+  unarchive: 
+    src: "roles/app_config_setup/templates/grafana/grafana.zip"
+    dest: "{{cepfolder}}/cep/grafana/"
 
 - name: spin grafana service
   shell: >
