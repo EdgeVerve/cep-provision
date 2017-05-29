@@ -51,9 +51,12 @@
   ignore_errors: yes
 
 - name: Kill cAdvisor process
-  shell: kill -9 `pgrep cadvisor` && systemctl stop cadvisor 
+  service: name=cadvisor state=stopped enabled=no
   ignore_errors: yes
   
+- name: remove cadvisor service file
+  file: path=/usr/lib/systemd/system/cadvisor.service state=absent 
+    
 - name: Remove conf,certs,cep,docker data folder
   file: path={{item.path}} state=absent
   with_items:
@@ -77,6 +80,13 @@
 - name: remove volume group
   command: vgremove {{docker_storage_vg}}
   when: directLVMstorage == True or directLVMstorage == "yes"
+  ignore_errors: yes
+
+- name: Removing mounting volume at startup (fstab entry)
+  lineinfile: 
+    line: "/dev/{{docker_storage_vg}}/{{docker_storage_datadisk_name}} {{cepfolder}}/cep ext4  nofail,auto,noatime,rw,user    0   0"
+    path: /etc/fstab
+    state: absent
   ignore_errors: yes
   
 - name: remove docker-storage config  
