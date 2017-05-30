@@ -104,7 +104,7 @@ ansible-playbook --flush-cache CEP_Uninstall.yml -i Inventory_CEP
 ```
 Provide responses for the prompts to complete uninstallation. To run as a single command instead of interactive prompts, use the below command with preset inputs.
 ```
-ansible-playbook --flush-cache CEP_Uninstall.yml -i Inventory_CEP --extra-vars "CONFIRM=yes DomainName=cepapp.qa ceppaasfolder=/datadisk"
+ansible-playbook --flush-cache CEP_Uninstall.yml -i Inventory_CEP --extra-vars "CONFIRM=yes DomainName=cepapp.qa cepfolder=/datadisk"
 ```
 
 ## More information
