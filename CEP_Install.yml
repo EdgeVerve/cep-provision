@@ -1,6 +1,6 @@
 #©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
 
-#Get inputs from users to setup EVPaaS
+#Get inputs from users to setup CEP
 - hosts: 
   - all
   - localhost
@@ -32,7 +32,7 @@
       private: no            
  
     - name: cepUI
-      prompt: "Install EVFCEP Portal - Portainer - yes/no"
+      prompt: "Install CEP Portal - Portainer - yes/no"
       default: "yes"
       private: no
       

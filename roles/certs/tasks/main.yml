@@ -56,7 +56,7 @@
   template: src='SSLCertificates/ca.pem' dest=/etc/docker/certs.d/{{registryname}}/{{domainname}}.ca.crt
   when: (certgenneeded == "no" or certgenneeded == False)  
   
-- name: Creates directory for EVF Registry SSL certificates
+- name: Creates directory for CEP Registry SSL certificates
   file: path=/etc/docker/certs.d/{{ceppubregdomainname}} state=directory
   when:  ceppubregip!= ""
 
