@@ -30,7 +30,7 @@ At the end of running this script you have,
 5. Code repository Gitlab running on https://gitlab.<domain\> [Optional]
 
 If your servers have private IP one can access by giving appropriate host entry. For public access, one can
-put A-record for server ip for *.<domain> and URL's can be accessed through it. 
+put A-record for server ip for *.<domain\> and URL's can be accessed through it. 
 
 ## Pre-Requisites
 
