@@ -23,11 +23,11 @@ This scripts includes the following steps,
 10. Installation of gitlab server. ([more](https://about.gitlab.com/features/))
 
 At the end of running this script you have,
-1. Private registry (v2 API) running at https://registry.<<domain>>
-2. Container management portal running at https://cep-portal.<<domain>>
-3. Monitoring graphs running at https://cep-monitoring.<<domain>>
-4. Logging service running on https://graylog.<<domain>> [Optional]
-5. Code repository Gitlab running on https://gitlab.<<domain>> [Optional]
+1. Private registry (v2 API) running at https://registry.<domain\>
+2. Container management portal running at https://cep-portal.<domain\>
+3. Monitoring graphs running at https://cep-monitoring.<domain\>
+4. Logging service running on https://graylog.<domain\> [Optional]
+5. Code repository Gitlab running on https://gitlab.<domain\> [Optional]
 
 If your servers have private IP one can access by giving appropriate host entry. For public access, one can
 put A-record for server ip for *.<domain> and URL's can be accessed through it. 
