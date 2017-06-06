@@ -1,4 +1,11 @@
-## Getting Started
+# Getting Started
+
+## Pre-Requisites
+
+* Linux based  - CentOS > 7 or RHEL > 7 (64 bit)
+* Ansible (version > 2.2.0)
+
+### Install CEP
 
 You can follow the below steps to setup a CEP environment either in Public CLoud VMs (AWS, Azure etc), Private Cloud VMs or locally.
  
@@ -7,7 +14,7 @@ To begin with, get the source code
 ```
 git clone https://github.com/EdgeVerve/cep-provision.git
 ```
-Navigate to the cloned folder and modify Inventory File to add the details of your machines,
+Navigate to the cloned folder and modify Inventory File(Inventory_CEP for default) to add the details of your machines,
 
 * *[manager]* - Add the machine details which needs to be created as manager mode in docker swarm cluster.
 
@@ -21,7 +28,6 @@ export https_proxy=http://username:urlencodedpassword@proxyIp:port
 export no_proxy=whatever no proxy ip addresses/domain names needed
 ```
 
-## Install CEP
 
 set the following Environment variable required for Ansible
 

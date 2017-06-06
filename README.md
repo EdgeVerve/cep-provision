@@ -8,6 +8,9 @@ CEP leverages docker swarm cluster which allows us to orchestrate docker contain
 5. Service monitoring
 6. Service Logging
 
+## Getting Started 
+Starting guide can be found [here](./docs/GettingStarted.md)
+
 ## Steps covered
 This scripts includes the following steps,
 
@@ -32,18 +35,10 @@ At the end of running this script you have,
 If your servers have private IP one can access by giving appropriate host entry. For public access, one can
 put A-record for server ip for *.<domain\> and URL's can be accessed through it. 
 
-## Pre-Requisites
-
-* Linux based  - CentOS > 7 or RHEL > 7 (64 bit)
-* Ansible (version > 2.2.0)
-
-## Getting Started 
-  Starting guide can be found [here](./docs/GettingStarted.md)
-
 ## More information
 Please visit [oeCloud.io](https://www.oecloud.io)
 
-## Known Issus
+## Known Issues
 
 1. Currently cep components needing persistence have been constrained to one box. So currently that counts as a 
    single point of failure. We are working on it.
