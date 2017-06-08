@@ -14,7 +14,7 @@
      
 - name: Adding crontab entry for cleanup
   lineinfile: 
-    line: "* * * * * root {{cepfolder}}/cep/cleanup-cron-script/cleanup.sh"
-    path: /etc/crontab
+    line: "{{cleanup_cron_timing}} {{cleanup_cron_user}} {{cepfolder}}/cep/cleanup-cron-script/cleanup.sh"
+    path: {{crontab_file}}
     state: present
 
