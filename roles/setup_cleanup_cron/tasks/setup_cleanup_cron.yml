@@ -17,4 +17,4 @@
     line: "{{cleanup_cron_timing}} {{cleanup_cron_user}} {{cepfolder}}/cep/cleanup-cron-script/cleanup.sh"
     path: {{crontab_file}}
     state: present
-
+  when: cleanup_cron_enable == true or cleanup_cron_enable == True or cleanup_cron_enable == yes or cleanup_cron_enable == Yes
