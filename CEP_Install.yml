@@ -76,7 +76,7 @@
   - NFSServer
   
   roles:
-    - { role: NFSServer, when: setupNFS == True or setupNFS == "yes"}
+    - { role: setup_NFS, when: setupNFS == True or setupNFS == "yes"}
         
 #Install Docker engine in all machines
 - hosts:

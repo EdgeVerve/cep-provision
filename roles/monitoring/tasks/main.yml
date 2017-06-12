@@ -27,6 +27,10 @@
   include: prometheus.yml
   when: existing_prom_op.stdout == "0"
   
+- name: Reload prometheus if config changed
+  shell: "docker service update cep-prometheus-server --force"
+  when: existing_prom_op.stdout != "0" and prom_conf_changed is defined and ( prom_conf_changed | changed )
+  
 - name: check if grafana is already present
   shell: "docker service ls | grep cep-grafana-server| wc -l"
   register: existing_grafana_op

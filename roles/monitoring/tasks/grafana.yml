@@ -3,12 +3,28 @@
 - name: unarchive grafana data files
   unarchive: 
     src: "roles/app_config_setup/templates/grafana/grafana.zip"
-    dest: "{{cepfolder}}/cep/grafana/"
+    dest: "{{cepfolder}}/cep/cep-data/grafana"
+
 
 - name: spin grafana service
   shell: >
          docker service create 
-         --mount target=/var/lib/grafana,source={{cepfolder}}/cep/grafana,type=bind
+         --mount target=/var/lib/grafana,source={{cepfolder}}/cep/cep-data/grafana,type=bind
+         -e FORCE_SSL=yes 
+         -e SERVICE_PORTS="3000" 
+         -e VIRTUAL_HOST="https://grafana.{{domainname}},grafana.{{domainname}}" 
+         -e "GF_SERVER_ROOT_URL=https://grafana.{{domainname}}" 
+         -e "PROMETHEUS_ENDPOINT=http://prometheus-server:9090" 
+         --constraint "node.hostname == $HOSTNAME"
+         --network router_network 
+         --name cep-grafana-server 
+         {{ grafana }}
+  when: (useRemoteData == False or useRemoteData == "no")
+
+- name: spin grafana service
+  shell: >
+         docker service create 
+         --mount target=/var/lib/grafana,source={{cepfolder}}/cep/cep-data/grafana,type=bind
          -e FORCE_SSL=yes 
          -e SERVICE_PORTS="3000" 
          -e VIRTUAL_HOST="https://grafana.{{domainname}},grafana.{{domainname}}" 
@@ -17,3 +33,4 @@
          --network router_network 
          --name cep-grafana-server 
          {{ grafana }}
+  when: (useRemoteData == True or useRemoteData == "yes")
