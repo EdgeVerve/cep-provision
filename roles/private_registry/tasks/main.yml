@@ -1,20 +1,16 @@
 #©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
 
 - name: check if registry is already present
-  shell: "docker service ls | grep private_registry| wc -l"
+  shell: "docker service ls | grep cep_registry | wc -l"
   register: existing_registry_op
   ignore_errors: yes
-
-- name: create backup volume for registry
-  shell: docker volume create registry-backup
-  when: existing_registry_op.stdout == "0"
   
 - name: spin registry container
   shell: >
          docker service create 
-         --name private_registry 
+         --name cep_registry 
          --network router_network
-         --mount target=/var/lib/registry,source=registry-backup,type=volume,volume-label="backup-type=registry",volume-label="backup=true"
+         --mount target=/var/lib/registry,source={{cepfolder}}/cep/cep-data/registry,type=bind
          --constraint "node.hostname == $HOSTNAME"
          -e REGISTRY_HTTP_SECRET=secret
          -e REGISTRY_LOG_LEVEL=debug
@@ -22,7 +18,21 @@
          -e SERVICE_PORTS="5000" 
          -e VIRTUAL_HOST="https://registry.{{domainname}},registry.{{domainname}}"
          {{ registry }}
-  when: existing_registry_op.stdout == "0"
+  when: existing_registry_op.stdout == "0" and (useRemoteData == False or useRemoteData == "no")
+  
+- name: spin registry container
+  shell: >
+         docker service create 
+         --name cep_registry 
+         --network router_network
+         --mount target=/var/lib/registry,source={{cepfolder}}/cep/cep-data/registry,type=bind
+         -e REGISTRY_HTTP_SECRET=secret
+         -e REGISTRY_LOG_LEVEL=debug
+         -e FORCE_SSL=yes 
+         -e SERVICE_PORTS="5000" 
+         -e VIRTUAL_HOST="https://registry.{{domainname}},registry.{{domainname}}"
+         {{ registry }}
+  when: existing_registry_op.stdout == "0" and (useRemoteData == True or useRemoteData == "yes")
   
 - name : Pull app base images from cep registry - {{ceppubregdomainname}}
   command: docker pull "{{ceppubregdomainname}}/{{ item.name }}:{{ item.tag }}"
@@ -31,7 +41,7 @@
     - { name: "{{public_alpine_node_git}}", tag: "{{public_node_git_tag}}" }
     - { name: "{{public_alpine_mongo}}", tag: "{{public_mongo_tag}}" }
   when: existing_registry_op.stdout == "0"
-   
+     
 - name: private registry entry in /etc/hosts of each node - {{  inventory_hostname }} {{registryname}}
   lineinfile: dest=/etc/hosts line="{{ inventory_hostname }} {{registryname}}" state=present
   when: existing_registry_op.stdout == "0"
@@ -51,6 +61,7 @@
     - { name: "{{alpine_node_git}}", tag: "{{node_git_tag}}" }
     - { name: "{{alpine_mongo}}", tag: "{{mongo_tag}}" }
   when: existing_registry_op.stdout == "0"
+    
     
 - name: clean up images in host machines
   docker_image:
