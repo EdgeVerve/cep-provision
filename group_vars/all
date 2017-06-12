@@ -80,3 +80,11 @@ swarm_manager_operational_list: "['']" #Initiation of variable
 swarm_manager_bootstrap_list: "['']" #Initiation of variable
 swarm_worker_operational_list: "['']" #Initiation of variable
 swarm_worker_bootstrap_list: "['']" #Initiation of variable
+
+#---------------------------------------------------------------
+#Cleanup Cron Parameters
+#---------------------------------------------------------------
+cleanup_cron_enable: "true"
+cleanup_cron_timing: "0 4 * * *"
+cleanup_cron_user: "root"
+crontab_file: "/etc/crontab"

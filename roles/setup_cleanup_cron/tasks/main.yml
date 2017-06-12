@@ -1,0 +1,6 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: Setup a cron job to cleanup orphan images, etc.,
+  include: setup_cleanup_cron.yml
+  when: ansible_os_family == 'RedHat' and (directLVMstorage == True or directLVMstorage == "yes")
+
