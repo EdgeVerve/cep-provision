@@ -1,0 +1,20 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: Make folder for cleanup shell script
+  file: "path={{cepfolder}}/cep/cleanup-cron-script state=directory"
+  when: directLVMstorage == True or directLVMstorage == "yes"
+  
+- name: Copy required files
+  template: "src={{item.src}} dest={{item.dest}} "
+  with_items:
+    -
+      dest: "{{cepfolder}}/cep/cleanup-cron-script/cleanup.sh"
+      src: "cleanup_scripts/cleanup.sh"
+  when: directLVMstorage == True or directLVMstorage == "yes"
+     
+- name: Adding crontab entry for cleanup
+  lineinfile: 
+    line: "{{cleanup_cron_timing}} {{cleanup_cron_user}} {{cepfolder}}/cep/cleanup-cron-script/cleanup.sh"
+    path: {{crontab_file}}
+    state: present
+  when: cleanup_cron_enable == true or cleanup_cron_enable == True or cleanup_cron_enable == yes or cleanup_cron_enable == Yes

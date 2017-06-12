@@ -80,6 +80,7 @@
     - certs
     - install_docker
     - app_config_setup
+    - setup_cleanup_cron
     - { role: cadvisor, when: installmonitor == True or installmonitor == "yes"}
 
 #Determine swarm status for manager
