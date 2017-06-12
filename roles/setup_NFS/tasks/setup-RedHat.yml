@@ -1,0 +1,23 @@
+---
+- name: Ensure NFS utilities are installed.
+  package: name=nfs-utils state=installed
+
+- name: Ensure rpcbind is running.
+  service: name=rpcbind state=started enabled=yes
+  
+- name: Enable docker ports in firewalld
+  firewalld: port={{item.port}} permanent=true state=enabled
+  with_items:
+    - { port: 111/tcp }
+    - { port: 54302/tcp }
+    - { port: 20048/tcp }
+    - { port: 2049/tcp }
+    - { port: 46666/tcp }
+    - { port: 42955/tcp }
+    - { port: 875/tcp }
+  register: firewalld_op
+    
+- name: restart firewalld
+  command: firewall-cmd --reload
+  when: firewalld_op | changed  
+

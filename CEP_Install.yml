@@ -70,10 +70,17 @@
   
   roles:
     - cert_generation
+
+#Setup NFSServer if provided
+- hosts:
+  - NFSServer
+  
+  roles:
+    - { role: NFSServer, when: setupNFS == True or setupNFS == "yes"}
         
 #Install Docker engine in all machines
 - hosts:
-  - all
+  - AllHosts
   
   roles:
     - docker_storage
@@ -82,7 +89,7 @@
     - app_config_setup
     - { role: setup_cleanup_cron, when: cleanup_cron_enable == true or cleanup_cron_enable == True or cleanup_cron_enable == yes or cleanup_cron_enable == Yes}
     - { role: cadvisor, when: installmonitor == True or installmonitor == "yes"}
-
+    
 #Determine swarm status for manager
 - hosts:
   - manager

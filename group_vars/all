@@ -88,3 +88,10 @@ cleanup_cron_enable: "true"
 cleanup_cron_timing: "0 4 * * *"
 cleanup_cron_user: "root"
 crontab_file: "/etc/crontab"
+
+#---------------------------------------------------------------
+#NFS Server for persistent storage
+#---------------------------------------------------------------
+setupNFS: yes 
+NFSSharePath: 
+#nfs_exports: { "{{NFSSharePath}} *(rw,sync,no_root_squash)" }

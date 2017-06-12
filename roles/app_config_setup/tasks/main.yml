@@ -28,5 +28,25 @@
     -
       dest: "{{cepfolder}}/cep/alertmanager/alertmanager.conf"
       src: "prometheus/alertmanager.conf"
-  when: installmonitor == True or installmonitor == "yes"
+  when: installmonitor == True or installmonitor == "yes"  
   
+#Install nfs-common
+- name: "Install nfs-common"
+  yum: 
+    name: nfs-common
+    state: present
+  environment:
+    http_proxy: "{{http_proxy}}"
+    https_proxy: "{{https_proxy}}" 
+    no_proxy: "{{no_proxy}}"
+  when: setupNFS == True or setupNFS == "yes"
+  
+#mount -t nfs {{nfsserver_ip}}:{{nfsshare}}/evfpaasshare /etc/evfpaasshare    
+- name: mount NFS share folder
+  mount:
+    path: "{{cepfolder}}/cep/cep-data" 
+    src: "{{  hostvars[groups['NFSServer'][0]]['inventory_hostname'] }}:{{NFSSharePath}}" 
+    fstype: nfs4
+    opts: nofail,auto,noatime,rw,user 
+    state: present    
+  when: setupNFS == True or setupNFS == "yes"
