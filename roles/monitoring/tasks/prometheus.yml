@@ -6,6 +6,25 @@
          --name cep-prometheus-server
          --network router_network 
          --mount target=/config,source={{cepfolder}}/cep/prometheus,type=bind
+         --mount target=/data,source={{cepfolder}}/cep/cep-data/prometheus,type=bind
+         -e FORCE_SSL=yes 
+         -e SERVICE_PORTS="9090" 
+         -e VIRTUAL_HOST="https://prometheus.{{domainname}},prometheus.{{domainname}}" 
+         --constraint "node.hostname == $HOSTNAME"
+         {{ prometheus }}
+         -config.file=/config/prometheus.conf 
+         -web.console.templates=/usr/share/prometheus/consoles 
+         -web.console.libraries=/usr/share/prometheus/console_libraries
+         -alertmanager.url=http://cep-alertmanager:9093
+  when: existing_paasui_op.stdout == "0" and (useRemoteData == False or useRemoteData == "no")
+  
+- name: spin prometheus container
+  shell: >
+         docker service create
+         --name cep-prometheus-server
+         --network router_network 
+         --mount target=/config,source={{cepfolder}}/cep/prometheus,type=bind
+         --mount target=/data,source={{cepfolder}}/cep/cep-data/prometheus,type=bind
          -e FORCE_SSL=yes 
          -e SERVICE_PORTS="9090" 
          -e VIRTUAL_HOST="https://prometheus.{{domainname}},prometheus.{{domainname}}" 
@@ -14,3 +33,4 @@
          -web.console.templates=/usr/share/prometheus/consoles 
          -web.console.libraries=/usr/share/prometheus/console_libraries
          -alertmanager.url=http://cep-alertmanager:9093
+  when: existing_paasui_op.stdout == "0" and (useRemoteData == True or useRemoteData == "yes")
