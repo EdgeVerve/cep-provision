@@ -94,4 +94,4 @@ crontab_file: "/etc/crontab"
 #NFS Server for persistent storage
 #---------------------------------------------------------------
 setupNFS: yes 
-NFSSharePath:
+NFSSharePath: /datadisk/nfsshare

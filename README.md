@@ -24,6 +24,7 @@ This scripts includes the following steps,
 8.  Installation of portal for swarm management. ([more](https://github.com/portainer/portainer))
 9.  Setup of logging module. ([more](https://github.com/Graylog2/graylog2-server))
 10. Installation of gitlab server. ([more](https://about.gitlab.com/features/))
+11. Setup cronjob to cleanup orphan volumes, images, containers, networks and garbage collect private registry ([more](./docs/Cleanup_cronjob.md))
 
 At the end of running this script you have,
 1. Private registry (v2 API) running at https://registry.<domain\>
