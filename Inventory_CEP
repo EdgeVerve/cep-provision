@@ -14,6 +14,10 @@
 10.66.96.69 ansible_ssh_user=user ansible_ssh_pass=password ansible_become=true ansible_become_method=sudo ansible_become_pass=password
 10.66.96.70 ansible_ssh_user=user ansible_ssh_pass=password ansible_become=true ansible_become_method=sudo ansible_become_pass=password
 
+# Uncomment to setup NFS Server for persistent storage of cep component
+#[NFSServer]
+#10.66.96.90 ansible_ssh_user=user ansible_ssh_pass=password ansible_become=true ansible_become_method=sudo ansible_become_pass=password
+
 [AllHosts:children]
 manager
 worker

@@ -49,6 +49,14 @@
 - name: Unmount /var/lib/docker folder if mounted
   shell: umount -lR /var/lib/docker/* /var/lib/docker/devicemapper/mnt/* /var/lib/docker/ 
   ignore_errors: yes
+  
+- name: Unmount NFS share folder
+  mount:
+    path: "{{cepfolder}}/cep/cep-data" 
+    src: "{{  hostvars[groups['NFSServer'][0]]['inventory_hostname'] }}:{{NFSSharePath}}" 
+    fstype: nfs4
+    opts: nofail,auto,noatime,rw,user 
+    state: unmounted
 
 - name: Kill cAdvisor process
   service: name=cadvisor state=stopped enabled=no
@@ -88,6 +96,12 @@
     path: /etc/fstab
     state: absent
   ignore_errors: yes
+  
+- name: Remove crontab entry for cleanup
+  lineinfile:
+    line: "{{cleanup_cron_timing}} {{cleanup_cron_user}} {{cepfolder}}/cep/cleanup-cron-script/cleanup.sh"
+    path: "{{crontab_file}}"
+    state: absent
   
 - name: remove docker-storage config  
   file: path=/etc/sysconfig/docker-storage state=absent

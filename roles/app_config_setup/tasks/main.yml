@@ -1,5 +1,29 @@
 #©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
 
+#Install nfs-utils
+- name: "Install nfs-utils"
+  yum: 
+    name: nfs-utils
+    state: present
+  environment:
+    http_proxy: "{{http_proxy}}"
+    https_proxy: "{{https_proxy}}" 
+    no_proxy: "{{no_proxy}}"
+  when: setupNFS == True or setupNFS == "yes"
+
+- name: Create folder for cep data
+  file: path={{cepfolder}}/cep/cep-data state=directory
+    
+#mount -t nfs {{nfsserver_ip}}:{{nfsshare}}/evfpaasshare /etc/evfpaasshare
+- name: mount NFS share folder
+  mount:
+    path: "{{cepfolder}}/cep/cep-data" 
+    src: "{{  hostvars[groups['NFSServer'][0]]['inventory_hostname'] }}:{{NFSSharePath}}" 
+    fstype: nfs4
+    opts: nofail,auto,noatime,rw,user 
+    state: mounted    
+  when: setupNFS == True or setupNFS == "yes"
+
 - name: Create backup folder for registry
   file: path={{cepfolder}}/cep/cep-data/registry state=directory
   
@@ -44,3 +68,4 @@
       src: "prometheus/alertmanager.conf"
   register: prom_conf_changed
   when: installmonitor == True or installmonitor == "yes"
+
