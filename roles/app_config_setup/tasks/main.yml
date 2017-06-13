@@ -67,4 +67,5 @@
       dest: "{{cepfolder}}/cep/alertmanager/alertmanager.conf"
       src: "prometheus/alertmanager.conf"
   register: prom_conf_changed
-  when: installmonitor == True or installmonitor == "yes"  
+  when: installmonitor == True or installmonitor == "yes"
+
