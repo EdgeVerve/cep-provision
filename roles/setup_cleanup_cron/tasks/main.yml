@@ -10,6 +10,9 @@
       dest: "{{cepfolder}}/cep/cleanup-cron-script/cleanup.sh"
       src: "cleanup_scripts/cleanup.sh"
 
+- name: Make script executable
+  shell: "sh chmod +x {{cepfolder}}/cep/cleanup-cron-script/cleanup.sh"
+
 - name: Adding crontab entry for cleanup
   lineinfile:
     line: "{{cleanup_cron_timing}} {{cleanup_cron_user}} {{cepfolder}}/cep/cleanup-cron-script/cleanup.sh"
