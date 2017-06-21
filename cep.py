@@ -115,7 +115,14 @@ class MyHandler(BaseHTTPRequestHandler):
 if __name__ == "__main__":
     try:
         server = HTTPServer(('0.0.0.0', 9090), MyHandler)
-        print('Started http server at http://<this_host>:9090/index.html')
+        print('Started http server.')
+        print('')
+        print('For CEP installer UI, go to http://<this_host>:9090/index.html')
+        print('')
+        print('')
+        print('Press ^C to shut down this server.')
+        print('')
+        print('')
         server.serve_forever()
     except KeyboardInterrupt:
         print('^C received, shutting down server')

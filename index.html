@@ -45,8 +45,8 @@ Run Yum Update? <input type="radio" name="YumUpdate" value="yes" id="YumUpdateYe
 Domain Name <input type="text" name="DomainName" value="" id="DomainName"><br>
 CEP Folder <input type="text" name="CEPFolder" value="eg: /datadisk" id="CEPFolder"><br>
 Install GitLab? <input type="radio" name="InstallGitlab" value="yes" id="InstallGitlabYes">Yes <input type="radio" name="InstallGitlab" value="no" checked id="InstallGitlabNo">No<br>
-Need LVM? <input type="radio" name="NeedLVM" value="yes" id="NeedLVMYes">Yes <input type="radio" name="NeedLVM" value="no" checked id="NeedLVMNo">No<br>
-LVM Volume <input type="text" name="LVMVolume" value="eg: /dev/sdb" id="LVMVolume"><br>
+Need LVM? <input type="radio" name="NeedLVM" value="yes" id="NeedLVMYes" onCLick="document.forms[0].LVMVolume.disabled=false;">Yes <input type="radio" name="NeedLVM" value="no" checked id="NeedLVMNo" onCLick="document.forms[0].LVMVolume.disabled=true;">No<br>
+LVM Volume <input type="text" name="LVMVolume" value="eg: /dev/sdb" id="LVMVolume" disabled><br>
 Install CEP UI? <input type="radio" name="CEPUI" value="yes" checked id="CEPUIYes">Yes <input type="radio" name="CEPUI" value="no" id="CEPUINo">No<br>
 Install CEP Monitoring? <input type="radio" name="CEPMon" value="yes" checked id="CEPMonYes">Yes <input type="radio" name="CEPMon" value="no" id="CEPMonNo">No<br>
 Install GrayLog? <input type="radio" name="GrayLog" value="yes" checked>Yes <input type="radio" name="GrayLog" value="no">No<br><br>
