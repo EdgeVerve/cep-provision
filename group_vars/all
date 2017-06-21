@@ -85,7 +85,7 @@ swarm_worker_bootstrap_list: "['']" #Initiation of variable
 #---------------------------------------------------------------
 #Cleanup Cron Parameters
 #---------------------------------------------------------------
-cleanup_cron_enable: yes
+cleanup_cron_enable: no
 cleanup_cron_timing: "0 4 * * *"
 cleanup_cron_user: "root"
 crontab_file: "/etc/crontab"
@@ -93,5 +93,5 @@ crontab_file: "/etc/crontab"
 #---------------------------------------------------------------
 #NFS Server for persistent storage
 #---------------------------------------------------------------
-setupNFS: yes 
+setupNFS: no 
 NFSSharePath: /datadisk/nfsshare
