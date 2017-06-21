@@ -11,6 +11,7 @@
          -e SERVICE_PORTS="9093" 
          -e VIRTUAL_HOST="https://alertmanager.{{domainname}},alertmanager.{{domainname}}" 
          {{ alertmanager }}
+           -config.file=/config/alertmanager.conf
   when: (useRemoteData == False or useRemoteData == "no")  
   
 - name: spin alertmanager container

@@ -44,6 +44,9 @@
      
 - name: private registry entry in /etc/hosts of each node - {{  inventory_hostname }} {{registryname}}
   lineinfile: dest=/etc/hosts line="{{ inventory_hostname }} {{registryname}}" state=present
+  delegate_to: "{{item}}"
+  delegate_facts: True
+  with_items: "{{groups['AllHosts']}}"
   when: existing_registry_op.stdout == "0"
   
 - name : tag base images
