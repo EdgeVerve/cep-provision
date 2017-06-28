@@ -89,9 +89,3 @@ cleanup_cron_enable: yes
 cleanup_cron_timing: "0 4 * * *"
 cleanup_cron_user: "root"
 crontab_file: "/etc/crontab"
-
-#---------------------------------------------------------------
-#NFS Server for persistent storage
-#---------------------------------------------------------------
-setupNFS: yes 
-NFSSharePath: /datadisk/nfsshare

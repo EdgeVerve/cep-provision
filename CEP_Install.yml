@@ -7,11 +7,6 @@
   
   vars_prompt:
   
-    - name: YumUpdate
-      prompt: "Do you want to Update Packages to latest - yes/no"
-      default: "no"
-      private: no 
-    
     - name: DomainName
       prompt: "Set Domain Name to access application/services(DNS should support *.domainname)"
       default: "cepapp.dev"
@@ -26,6 +21,16 @@
       prompt: "Disk path for docker storage setup (required if lvm setup is yes)"
       default: "/dev/sdb"
       private: no
+
+    - name: setupNFS
+      prompt: "Do you want setup NFS Server to persist CEP Component data"
+      default: "no"
+      private: no
+    
+    - name: NFSSharepath
+      prompt: "Specify NFS Server share Folder (required if NFS Server setup is yes)"
+      default: "no"
+      private: no      
       
     - name: cepfolder
       prompt: "Specify an folder for cep config and data files (eg: /datadisk)"
@@ -61,8 +66,8 @@
         docker_storage_devs: "{{Docker_storage_devs}}"
         installgraylog: "{{cepGraylog}}"
         installmonitor: "{{cepmon}}"
-        yum_update: "{{YumUpdate}}"
-        
+        setupNFS: "{{setupNFS}}"
+        NFSSharePath: "{{NFSSharepath}}" 
 
 #Generate certificates
 - hosts:

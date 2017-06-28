@@ -1,15 +1,5 @@
 #©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
 
-- name: Yum Update   
-  yum:
-    name: '*'
-    state: latest      
-  environment:
-    http_proxy: "{{http_proxy}}"
-    https_proxy: "{{https_proxy}}" 
-    no_proxy: "{{no_proxy}}"
-  when: (yum_update == True or yum_update == "yes")
-
 - name: Add docker repo
   yum_repository:
     name: docker
@@ -84,6 +74,9 @@
   template: src='rhel_daemon.json' dest='{{cepfolder}}/cep/docker/daemon.json'
   when: directLVMstorage == False or directLVMstorage == "no"
   
+- name: Ensure firewalld is running.
+  service: name=firewalld state=started enabled=yes
+
 - name: Enable docker ports in firewalld
   firewalld: port={{item.port}} permanent=true state=enabled
   with_items:
