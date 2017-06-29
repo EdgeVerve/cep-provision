@@ -4,9 +4,9 @@
   yum_repository:
     name: docker
     description: Docker Repository
-    baseurl: https://yum.dockerproject.org/repo/main/centos/7/
+    baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
     gpgcheck: yes
-    gpgkey: https://yum.dockerproject.org/gpg
+    gpgkey: https://download.docker.com/linux/centos/gpg
     enabled: yes
   environment:
     http_proxy: "{{http_proxy}}"
@@ -54,9 +54,9 @@
     https_proxy: "{{https_proxy}}" 
     no_proxy: "{{no_proxy}}"
   
-- name: "Install docker engine"
+- name: "Install docker-ce"
   yum: 
-    name: docker-engine
+    name: docker-ce
     state: present
   environment:
     http_proxy: "{{http_proxy}}"

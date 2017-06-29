@@ -34,7 +34,7 @@
   yum: name={{item.name}} state=absent
   with_items:
     - { name: 'epel-release' }
-    - { name: 'docker-engine' }    
+    - { name: 'docker-ce' }    
 
 
 - name: Unmount netns /run/docker folder
@@ -57,6 +57,7 @@
     fstype: nfs4
     opts: nofail,auto,noatime,rw,user 
     state: unmounted
+  ignore_errors: yes
 
 - name: Kill cAdvisor process
   service: name=cadvisor state=stopped enabled=no
