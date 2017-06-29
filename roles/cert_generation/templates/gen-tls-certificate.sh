@@ -50,14 +50,10 @@ then
   exit 1
 fi
 
-if [ ! -e $configPath/openssl-client.cnf ]
-then 
-  echo "openssl-client.cnf not exists on $target"
-  exit 1
-fi
-
 ipIncr=3
 dnsIncr=3
+
+cp $configPath/openssl.cnf /tmp/openssl.cnf
 
 #Parsing alternative IPs to be included in certificates
 if [ ! -z "$ipList" ]; then
@@ -65,7 +61,7 @@ if [ ! -z "$ipList" ]; then
   echo "IP LIST:" $arrIP[1]
   for i in "$arrIP"
     do
-      echo "IP.$ipIncr = $i" >> $configPath/openssl.cnf
+      echo "IP.$ipIncr = $i" >> /tmp/openssl.cnf
       ipIncr=$((ipIncr + 1))
     done
 fi
@@ -76,7 +72,7 @@ if [ ! -z "$dnsList" ]; then
   echo "DNS LIST:" $arrDNS[0]
   for i in "$arrDNS"
     do
-      echo "DNS.$dnsIncr = $i" >> $configPath/openssl.cnf
+      echo "DNS.$dnsIncr = $i" >> /tmp/openssl.cnf
       dnsIncr=$((dnsIncr + 1))
     done
 fi
@@ -98,8 +94,8 @@ echo "Creating docker-priv-key"
 openssl genrsa -out $target/key.pem 2048 
 
 echo "Creating CSR"
-openssl req -new -key $target/key.pem -out $target/cert.csr -subj /CN=docker-server-client-$environment -config $configPath/openssl.cnf
+openssl req -new -key $target/key.pem -out $target/cert.csr -subj /CN=docker-server-client-$environment -config /tmp/openssl.cnf
 
 echo "Creating certificate"
-openssl x509 -sha1 -req -in $target/cert.csr -CA $target/ca.pem -CAkey $target/ca-priv-key.pem -CAcreateserial -out $target/cert.pem -days 3650 -extensions v3_req -extfile $configPath/openssl.cnf
+openssl x509 -sha1 -req -in $target/cert.csr -CA $target/ca.pem -CAkey $target/ca-priv-key.pem -CAcreateserial -out $target/cert.pem -days 3650 -extensions v3_req -extfile /tmp/openssl.cnf
 
