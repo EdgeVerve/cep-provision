@@ -1,0 +1,58 @@
+<HTML>
+<HEAD>
+<script>
+var f = document.forms[0];
+
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+    if (xhr.readyState == XMLHttpRequest.DONE) {
+        json=JSON.parse(xhr.responseText);
+        document.getElementById('YumUpdateYes').checked=json.YumUpdate[0]=='yes'?true:false;
+        document.getElementById('YumUpdateNo').checked=json.YumUpdate[0]=='no'?true:false;
+
+        document.getElementById('DomainName').value=json.DomainName[0];
+        document.getElementById('CEPFolder').value=json.CEPFolder[0];
+        document.getElementById('LVMVolume').value=json.LVMVolume[0];
+
+        document.getElementById('InstallGitlabYes').checked=json.InstallGitlab[0]=='yes'?true:false;
+        document.getElementById('InstallGitlabNo').checked=json.InstallGitlab[0]=='no'?true:false;
+
+        document.getElementById('NeedLVMYes').checked=json.NeedLVM[0]=='yes'?true:false;
+        document.getElementById('NeedLVMNo').checked=json.NeedLVM[0]=='no'?true:false;
+
+        document.getElementById('CEPUIYes').checked=json.CEPUI[0]=='yes'?true:false;
+        document.getElementById('CEPUINo').checked=json.CEPUI[0]=='no'?true:false;
+
+        document.getElementById('CEPMonYes').checked=json.CEPMon[0]=='yes'?true:false;
+        document.getElementById('CEPMonNo').checked=json.CEPMon[0]=='no'?true:false;
+
+        document.getElementById('GrayLogYes').checked=json.GrayLog[0]=='yes'?true:false;
+        document.getElementById('GrayLogNo').checked=json.GrayLog[0]=='no'?true:false;
+    }
+}
+xhr.open('GET', '/getdata', true);
+xhr.send(null);
+
+
+
+</script>
+
+</HEAD>
+<BODY>
+<H2>CEP Installation</H2>
+<form method="GET" action="/process">
+Run Yum Update? <input type="radio" name="YumUpdate" value="yes" id="YumUpdateYes">Yes <input type="radio" name="YumUpdate" value="no" checked id="YumUpdateNo">No<br>
+Domain Name <input type="text" name="DomainName" value="" id="DomainName"><br>
+CEP Folder <input type="text" name="CEPFolder" value="eg: /datadisk" id="CEPFolder"><br>
+Install GitLab? <input type="radio" name="InstallGitlab" value="yes" id="InstallGitlabYes">Yes <input type="radio" name="InstallGitlab" value="no" checked id="InstallGitlabNo">No<br>
+Need LVM? <input type="radio" name="NeedLVM" value="yes" id="NeedLVMYes" onCLick="document.forms[0].LVMVolume.disabled=false;">Yes <input type="radio" name="NeedLVM" value="no" checked id="NeedLVMNo" onCLick="document.forms[0].LVMVolume.disabled=true;">No<br>
+LVM Volume <input type="text" name="LVMVolume" value="eg: /dev/sdb" id="LVMVolume" disabled><br>
+Install CEP UI? <input type="radio" name="CEPUI" value="yes" checked id="CEPUIYes">Yes <input type="radio" name="CEPUI" value="no" id="CEPUINo">No<br>
+Install CEP Monitoring? <input type="radio" name="CEPMon" value="yes" checked id="CEPMonYes">Yes <input type="radio" name="CEPMon" value="no" id="CEPMonNo">No<br>
+Install GrayLog? <input type="radio" name="GrayLog" value="yes" checked>Yes <input type="radio" name="GrayLog" value="no">No<br><br>
+<INPUT TYPE="button" name="Install" value="Install" onClick="document.forms[0].action='/install';document.forms[0].submit();"/>
+<INPUT TYPE="button" name="UnInstall" value="UnInstall" onClick="document.forms[0].action='/uninstall';document.forms[0].submit();"/>
+
+</form>
+</BODY>
+</HTML> 
