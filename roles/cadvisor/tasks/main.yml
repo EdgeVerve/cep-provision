@@ -7,7 +7,7 @@
     
 - name: unarchive cadvisor
   unarchive:
-    src: "roles/cadvisor/templates/cadvisor.zip"
+    src: "roles/cadvisor/templates/cadvisor.tar.gz"
     dest: "{{cepfolder}}/cep/cAdvisor/"
       
 - name: Copy cadvisor service file

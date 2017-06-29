@@ -18,7 +18,7 @@
          -e SERVICE_PORTS="5000" 
          -e VIRTUAL_HOST="https://registry.{{domainname}},registry.{{domainname}}"
          {{ registry }}
-  when: existing_registry_op.stdout == "0" and (useRemoteData == False or useRemoteData == "no")
+  when: existing_registry_op.stdout == "0" and (setupNFS == False or setupNFS == "no")
   
 - name: spin registry container
   shell: >
@@ -32,7 +32,7 @@
          -e SERVICE_PORTS="5000" 
          -e VIRTUAL_HOST="https://registry.{{domainname}},registry.{{domainname}}"
          {{ registry }}
-  when: existing_registry_op.stdout == "0" and (useRemoteData == True or useRemoteData == "yes")
+  when: existing_registry_op.stdout == "0" and (setupNFS == True or setupNFS == "yes")
   
 - name : Pull app base images from cep registry - {{ceppubregdomainname}}
   command: docker pull "{{ceppubregdomainname}}/{{ item.name }}:{{ item.tag }}"

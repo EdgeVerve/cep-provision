@@ -27,7 +27,7 @@
          --host gitlab.{{domainname}}:{{inventory_hostname}}
          -e GITLAB_OMNIBUS_CONFIG="nginx['enable'] = true;nginx['listen_port'] = 80;nginx['listen_https'] = false;nginx['proxy_set_headers'] = {'X-Forwarded-Proto' => 'https','X-Forwarded-Ssl' => 'on'};external_url 'http://gitlab.{{domainname}}'"  
          {{ gitlab }}
-  when: existing_gitlab_op.stdout == "0" and (useRemoteData == True or useRemoteData == "yes")
+  when: existing_gitlab_op.stdout == "0" and (setupNFS == True or setupNFS == "yes")
   
 - name: spin a single instance of gitlab in swarm
   shell: >
@@ -43,4 +43,4 @@
          --host gitlab.{{domainname}}:{{inventory_hostname}}
          -e GITLAB_OMNIBUS_CONFIG="nginx['enable'] = true;nginx['listen_port'] = 80;nginx['listen_https'] = false;nginx['proxy_set_headers'] = {'X-Forwarded-Proto' => 'https','X-Forwarded-Ssl' => 'on'};external_url 'http://gitlab.{{domainname}}'"  
          {{ gitlab }}
-  when: existing_gitlab_op.stdout == "0"and (useRemoteData == False or useRemoteData == "no")
+  when: existing_gitlab_op.stdout == "0"and (setupNFS == False or setupNFS == "no")

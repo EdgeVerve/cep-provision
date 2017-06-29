@@ -4,6 +4,9 @@
 
 - name: Ensure rpcbind is running.
   service: name=rpcbind state=started enabled=yes
+
+- name: Ensure firewalld is running.
+  service: name=firewalld state=started enabled=yes
   
 - name: Enable docker ports in firewalld
   firewalld: port={{item.port}} permanent=true state=enabled

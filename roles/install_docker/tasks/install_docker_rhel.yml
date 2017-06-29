@@ -1,22 +1,12 @@
 #©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
 
-- name: Yum Update   
-  yum:
-    name: '*'
-    state: latest      
-  environment:
-    http_proxy: "{{http_proxy}}"
-    https_proxy: "{{https_proxy}}" 
-    no_proxy: "{{no_proxy}}"
-  when: (yum_update == True or yum_update == "yes")
-
 - name: Add docker repo
   yum_repository:
     name: docker
     description: Docker Repository
-    baseurl: https://yum.dockerproject.org/repo/main/centos/7/
+    baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
     gpgcheck: yes
-    gpgkey: https://yum.dockerproject.org/gpg
+    gpgkey: https://download.docker.com/linux/centos/gpg
     enabled: yes
   environment:
     http_proxy: "{{http_proxy}}"
@@ -64,9 +54,9 @@
     https_proxy: "{{https_proxy}}" 
     no_proxy: "{{no_proxy}}"
   
-- name: "Install docker engine"
+- name: "Install docker-ce"
   yum: 
-    name: docker-engine
+    name: docker-ce
     state: present
   environment:
     http_proxy: "{{http_proxy}}"
@@ -84,6 +74,9 @@
   template: src='rhel_daemon.json' dest='{{cepfolder}}/cep/docker/daemon.json'
   when: directLVMstorage == False or directLVMstorage == "no"
   
+- name: Ensure firewalld is running.
+  service: name=firewalld state=started enabled=yes
+
 - name: Enable docker ports in firewalld
   firewalld: port={{item.port}} permanent=true state=enabled
   with_items:
@@ -120,7 +113,7 @@
   template: src='docker.conf' dest='/etc/systemd/system/docker.service.d/docker.conf'
   register: docker_conf_op
 
-- name: Enable proxy to access images from docker public repo (consul only)
+- name: Enable proxy to access images from docker public repo
   template: src='http-proxy.conf' dest='/etc/systemd/system/docker.service.d/http-proxy.conf'
   when: enabledockerhub == True or enabledockerhub == "yes"
   register: docker_proxy_op
