@@ -9,7 +9,6 @@ ceppubregpass: ""  #If registry login (password) is needed to pull CEP component
 enabledockerhub: yes #Enable proxy in docker daemon
 certgenneeded: yes #If self-signed certificate generation is needed, if no please provide certificates in /roles/certs/templatesSSLCertificates/{{domainname}}/
 use_validcert_only_for_haproxy: yes #If set to yes, certificates provided/generated will be used only for haproxy (ssl termination)
-useRemoteData: no
 
 #---------------------------------------------------
 # Bases Images from public registry to setup EVPaaS 

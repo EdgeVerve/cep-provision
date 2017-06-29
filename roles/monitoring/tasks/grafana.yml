@@ -19,7 +19,7 @@
          --network router_network 
          --name cep-grafana-server 
          {{ grafana }}
-  when: (useRemoteData == False or useRemoteData == "no")
+  when: (setupNFS == False or setupNFS == "no")
 
 - name: spin grafana service
   shell: >
@@ -33,4 +33,4 @@
          --network router_network 
          --name cep-grafana-server 
          {{ grafana }}
-  when: (useRemoteData == True or useRemoteData == "yes")
+  when: (setupNFS == True or setupNFS == "yes")
