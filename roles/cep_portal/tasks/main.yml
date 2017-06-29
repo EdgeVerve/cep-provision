@@ -7,7 +7,7 @@
   
 - name: spin CEP Portal container
   shell: >
-         docker service create 
+         docker service create --with-registry-auth 
          --name cep_portal 
          --network router_network
          --mount target=/data,source={{cepfolder}}/cep/cep-data/cep-portal,type=bind
@@ -24,7 +24,7 @@
   
 - name: spin CEP Portal container
   shell: >
-         docker service create 
+         docker service create --with-registry-auth 
          --name cep_portal 
          --network router_network
          --mount target=/data,source={{cepfolder}}/cep/cep-data/cep-portal,type=bind

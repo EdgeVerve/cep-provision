@@ -2,7 +2,7 @@
 
 - name: spin node-exporter container globally
   shell: >
-        docker service create 
+        docker service create --with-registry-auth 
         --name cep-node-exporter 
         --mode global 
         -p 9100:9100 

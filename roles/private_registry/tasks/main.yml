@@ -7,7 +7,7 @@
   
 - name: spin registry container
   shell: >
-         docker service create 
+         docker service create --with-registry-auth 
          --name cep_registry 
          --network router_network
          --mount target=/var/lib/registry,source={{cepfolder}}/cep/cep-data/registry,type=bind
@@ -22,7 +22,7 @@
   
 - name: spin registry container
   shell: >
-         docker service create 
+         docker service create --with-registry-auth 
          --name cep_registry 
          --network router_network
          --mount target=/var/lib/registry,source={{cepfolder}}/cep/cep-data/registry,type=bind
