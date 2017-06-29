@@ -113,7 +113,7 @@
   template: src='docker.conf' dest='/etc/systemd/system/docker.service.d/docker.conf'
   register: docker_conf_op
 
-- name: Enable proxy to access images from docker public repo (consul only)
+- name: Enable proxy to access images from docker public repo
   template: src='http-proxy.conf' dest='/etc/systemd/system/docker.service.d/http-proxy.conf'
   when: enabledockerhub == True or enabledockerhub == "yes"
   register: docker_proxy_op

@@ -108,7 +108,7 @@
   when: directLVMstorage == True or directLVMstorage == "yes"
   ignore_errors: yes
   
-- name: Disable consul ports & SSL port in firewalld
+- name: Disable ports & SSL port in firewalld
   firewalld: port={{item.port}} permanent=true state=disabled
   with_items:
     - { port: 80/tcp }
