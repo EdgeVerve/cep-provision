@@ -10,12 +10,7 @@
          --mount target=/config,source={{cepfolder}}/cep/alertmanager,type=bind
          -e SERVICE_PORTS="9093" 
          -e VIRTUAL_HOST="https://alertmanager.{{domainname}},alertmanager.{{domainname}}" 
-<<<<<<< HEAD
          {{ alertmanager }} -config.file=/config/alertmanager.conf
-=======
-         {{ alertmanager }}
-           -config.file=/config/alertmanager.conf
->>>>>>> 8a21548f8c907c3afd40f58238e3ea62af3a2642
   when: (setupNFS == False or setupNFS == "no")  
   
 - name: spin alertmanager container
