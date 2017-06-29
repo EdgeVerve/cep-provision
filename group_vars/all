@@ -27,14 +27,10 @@ alertmanager: "{{ceppubregdomainname}}/prom/alertmanager:v0.7.1"
 #---------------------------------------------------------------------
 public_alpine_node: "mhart/alpine-node"
 public_node_tag: 7
-public_alpine_node_git: "fusioncomau/alpine-node-git"
-public_node_git_tag: 7
 public_alpine_mongo: "mvertes/alpine-mongo"
 public_mongo_tag: "3.4.4-0"
 alpine_node: "alpine-node"
 node_tag: latest
-alpine_node_git: "alpine-node-git"
-node_git_tag: latest
 alpine_mongo: "alpine-mongo"
 mongo_tag: latest
 #cep_executor: "cep-executor"
