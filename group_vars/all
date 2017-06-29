@@ -13,27 +13,23 @@ use_validcert_only_for_haproxy: yes #If set to yes, certificates provided/genera
 #---------------------------------------------------
 # Bases Images from public registry to setup EVPaaS 
 #---------------------------------------------------
-router: "{{ceppubregdomainname}}/dockercloud/haproxy:1.6.6"
-paasui: "{{ceppubregdomainname}}/portainer/portainer:1.13.2"
+router: "{{ceppubregdomainname}}/dockercloud/haproxy:1.6.7"
+paasui: "{{ceppubregdomainname}}/portainer/portainer:1.13.3"
 registry: "{{ceppubregdomainname}}/registry:2.6.1"
 node_exporter: "{{ceppubregdomainname}}/prom/node-exporter:v0.14.0"
-prometheus: "{{ceppubregdomainname}}/prom/prometheus:v1.6.3"
-grafana: "{{ceppubregdomainname}}/grafana/grafana:4.2.0"
-alertmanager: "{{ceppubregdomainname}}/prom/alertmanager:v0.6.2"
+prometheus: "{{ceppubregdomainname}}/prom/prometheus:v1.7.1"
+grafana: "{{ceppubregdomainname}}/grafana/grafana:4.3.2"
+alertmanager: "{{ceppubregdomainname}}/prom/alertmanager:v0.7.1"
 
 #---------------------------------------------------------------------
 # Base Images required in private registry for Application deployment
 #---------------------------------------------------------------------
 public_alpine_node: "mhart/alpine-node"
 public_node_tag: 7
-public_alpine_node_git: "fusioncomau/alpine-node-git"
-public_node_git_tag: 7
 public_alpine_mongo: "mvertes/alpine-mongo"
 public_mongo_tag: "3.4.4-0"
 alpine_node: "alpine-node"
 node_tag: latest
-alpine_node_git: "alpine-node-git"
-node_git_tag: latest
 alpine_mongo: "alpine-mongo"
 mongo_tag: latest
 #cep_executor: "cep-executor"
