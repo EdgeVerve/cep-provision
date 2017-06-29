@@ -10,7 +10,7 @@
 
 - name: spin gitlab runner service
   shell: >
-         docker service create 
+         docker service create --with-registry-auth 
          --name cep_gitlab_runner
          --mount target=/var/run/docker.sock,source=/var/run/docker.sock,type=bind
          -e URL="{{ gitrunner_gitlaburl }}" 
