@@ -2,7 +2,7 @@
 Description=CAdvisor Service
  
 [Service]
-ExecStart={{cepfolder}}/cep/cAdvisor/cadvisor/cadvisor
+ExecStart={{cepfolder}}/cep/cAdvisor/cadvisor
 StandardOutput=null
  
 [Install]
