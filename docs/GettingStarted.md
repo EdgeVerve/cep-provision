@@ -42,13 +42,15 @@ ansible-playbook --flush-cache CEP_Install.yml -i Inventory_CEP -c paramiko
 ```
 It will ask for inputs. Here's the description of each question it asks 
 
-* *Do you want to perform Yum Update - yes/no [no]*: In general the recommendation is to say yes. This ensures that you have latest updates installed from RHEL/CentOS. 
-
 * *Set Domain Name to access application/services(DNS should support \*.domainname) [cepapp.dev]*: This is the subdomain you are going to use to access the services hosted on CEP. e.g. if you give cepapp.qa as input, the applications you deploy on the CEP will be accessible as https://application.cepapp.qa. 
 
 * *Docker storage lvm setup required [no]*: By default you can use any kind of storage for docker daemon to store it's files,the recommendation is to have a lvm storage. The Ansible script can create a lvm storage from unmounted space for you.
 
 * *Docker storage setup required [/dev/sdb]*: The ansible will convert the unmounted space to lvm storage and configure the docker daemon to use it. Specify unmounted storage path.
+
+* *Do you want setup NFS Server to persist CEP Component data*: The ansible will setup NFS server on the machine specified in [NFSServer] group in inventory file and enable access to all the host machines in the cluster. 
+
+* *Specify NFS Server share Folder (required if NFS Server setup is yes)*: The NFS share path will be mounted in all host machines for persisting CEP component datas like registry, grafana, portainer etc. 
 
 * *Specify an folder for CEP config files and Docker data (eg: /datadisk)*: This is the folder on which CEP config files and data will be stored.
  
@@ -63,7 +65,7 @@ It will ask for inputs. Here's the description of each question it asks
 Provide responses for the prompts. To run as a single command instead of interactive prompts, use the below command with preset inputs.
 
 ```
-ANSIBLE_SCP_IF_SSH=y ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook --flush-cache CEP_Install.yml -i Inventory_CEP -c paramiko  --extra-vars "YumUpdate=yes DomainName=cepapp.qa cepfolder=/data InstallGitlab= cepUI=yes cepmon=yes cepGraylog= DirectLVMstorage=yes Docker_storage_devs=/dev/sdb"
+ANSIBLE_SCP_IF_SSH=y ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook --flush-cache CEP_Install.yml -i Inventory_CEP -c paramiko  --extra-vars "DomainName=cepapp.qa cepfolder=/data InstallGitlab= cepUI=yes cepmon=yes cepGraylog=yes DirectLVMstorage=yes Docker_storage_devs=/dev/sdb setupNFS= NFSSharepath="
 ```
 
 * ANSIBLE_SCP_IF_SSH - set to Y if SFTP is not enabled in the remote machines.

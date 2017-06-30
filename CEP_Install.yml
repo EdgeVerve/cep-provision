@@ -29,7 +29,6 @@
     
     - name: NFSSharepath
       prompt: "Specify NFS Server share Folder (required if NFS Server setup is yes)"
-      default: "no"
       private: no      
       
     - name: cepfolder
