@@ -1,14 +1,14 @@
 #©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
 
 - name: unarchive grafana data files
-  unarchive: 
-    src: "roles/app_config_setup/templates/grafana/grafana.zip"
-    dest: "{{cepfolder}}/cep/cep-data/grafana"
+  copy: 
+    src: "roles/monitoring/templates/grafana/grafana.db"
+    dest: "{{cepfolder}}/cep/cep-data/grafana/grafana.db"
 
 
 - name: spin grafana service
   shell: >
-         docker service create 
+         docker service create --with-registry-auth 
          --mount target=/var/lib/grafana,source={{cepfolder}}/cep/cep-data/grafana,type=bind
          -e FORCE_SSL=yes 
          -e SERVICE_PORTS="3000" 
@@ -19,11 +19,11 @@
          --network router_network 
          --name cep-grafana-server 
          {{ grafana }}
-  when: (useRemoteData == False or useRemoteData == "no")
+  when: (setupNFS == False or setupNFS == "no")
 
 - name: spin grafana service
   shell: >
-         docker service create 
+         docker service create --with-registry-auth 
          --mount target=/var/lib/grafana,source={{cepfolder}}/cep/cep-data/grafana,type=bind
          -e FORCE_SSL=yes 
          -e SERVICE_PORTS="3000" 
@@ -33,4 +33,4 @@
          --network router_network 
          --name cep-grafana-server 
          {{ grafana }}
-  when: (useRemoteData == True or useRemoteData == "yes")
+  when: (setupNFS == True or setupNFS == "yes")

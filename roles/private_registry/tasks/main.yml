@@ -7,7 +7,7 @@
   
 - name: spin registry container
   shell: >
-         docker service create 
+         docker service create --with-registry-auth 
          --name cep_registry 
          --network router_network
          --mount target=/var/lib/registry,source={{cepfolder}}/cep/cep-data/registry,type=bind
@@ -18,11 +18,11 @@
          -e SERVICE_PORTS="5000" 
          -e VIRTUAL_HOST="https://registry.{{domainname}},registry.{{domainname}}"
          {{ registry }}
-  when: existing_registry_op.stdout == "0" and (useRemoteData == False or useRemoteData == "no")
+  when: existing_registry_op.stdout == "0" and (setupNFS == False or setupNFS == "no")
   
 - name: spin registry container
   shell: >
-         docker service create 
+         docker service create --with-registry-auth 
          --name cep_registry 
          --network router_network
          --mount target=/var/lib/registry,source={{cepfolder}}/cep/cep-data/registry,type=bind
@@ -32,36 +32,31 @@
          -e SERVICE_PORTS="5000" 
          -e VIRTUAL_HOST="https://registry.{{domainname}},registry.{{domainname}}"
          {{ registry }}
-  when: existing_registry_op.stdout == "0" and (useRemoteData == True or useRemoteData == "yes")
+  when: existing_registry_op.stdout == "0" and (setupNFS == True or setupNFS == "yes")
   
 - name : Pull app base images from cep registry - {{ceppubregdomainname}}
   command: docker pull "{{ceppubregdomainname}}/{{ item.name }}:{{ item.tag }}"
   with_items:
     - { name: "{{public_alpine_node}}", tag: "{{public_node_tag}}" }
-    - { name: "{{public_alpine_node_git}}", tag: "{{public_node_git_tag}}" }
     - { name: "{{public_alpine_mongo}}", tag: "{{public_mongo_tag}}" }
-  when: existing_registry_op.stdout == "0"
      
 - name: private registry entry in /etc/hosts of each node - {{  inventory_hostname }} {{registryname}}
   lineinfile: dest=/etc/hosts line="{{ inventory_hostname }} {{registryname}}" state=present
-  when: existing_registry_op.stdout == "0"
+  delegate_to: "{{item}}"
+  delegate_facts: True
+  with_items: "{{groups['AllHosts']}}"
   
 - name : tag base images
   command: docker tag "{{ceppubregdomainname}}/{{ item.public_name }}:{{ item.public_tag }}" "{{registryname}}/{{ item.name }}:{{ item.tag }}"
   with_items:
     - { public_name: "{{public_alpine_node}}", public_tag: "{{public_node_tag}}", name: "{{alpine_node}}", tag: "{{node_tag}}" }
-    - { public_name: "{{public_alpine_node_git}}", public_tag: "{{public_node_git_tag}}", name: "{{alpine_node_git}}", tag: "{{node_git_tag}}" }
     - { public_name: "{{public_alpine_mongo}}", public_tag: "{{public_mongo_tag}}", name: "{{alpine_mongo}}", tag: "{{mongo_tag}}" }  
-  when: existing_registry_op.stdout == "0"
   
 - name : push images to private registry - {{registryname}}
   command: docker push "{{registryname}}/{{ item.name }}:{{ item.tag }}"
   with_items:
     - { name: "{{alpine_node}}", tag: "{{node_tag}}" }
-    - { name: "{{alpine_node_git}}", tag: "{{node_git_tag}}" }
     - { name: "{{alpine_mongo}}", tag: "{{mongo_tag}}" }
-  when: existing_registry_op.stdout == "0"
-    
     
 - name: clean up images in host machines
   docker_image:
@@ -70,9 +65,7 @@
     state: absent
   with_items:
     - { name: "{{registryname}}/{{alpine_node}}", tag: "{{node_tag}}" }
-    - { name: "{{registryname}}/{{alpine_node_git}}", tag: "{{node_git_tag}}" }
     - { name: "{{registryname}}/{{alpine_mongo}}", tag: "{{mongo_tag}}" }
     - { name: "{{ceppubregdomainname}}/{{public_alpine_node}}", tag: "{{public_node_tag}}" }
-    - { name: "{{ceppubregdomainname}}/{{public_alpine_node_git}}", tag: "{{public_node_git_tag}}" }
     - { name: "{{ceppubregdomainname}}/{{public_alpine_mongo}}", tag: "{{public_mongo_tag}}" }
   when: existing_registry_op.stdout == "0"  

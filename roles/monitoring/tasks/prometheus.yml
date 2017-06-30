@@ -16,7 +16,7 @@
          -web.console.templates=/usr/share/prometheus/consoles 
          -web.console.libraries=/usr/share/prometheus/console_libraries
          -alertmanager.url=http://cep-alertmanager:9093
-  when: (useRemoteData == False or useRemoteData == "no")
+  when: (setupNFS == False or setupNFS == "no")
   
 - name: spin prometheus container
   shell: >
@@ -33,4 +33,4 @@
          -web.console.templates=/usr/share/prometheus/consoles 
          -web.console.libraries=/usr/share/prometheus/console_libraries
          -alertmanager.url=http://cep-alertmanager:9093
-  when: (useRemoteData == True or useRemoteData == "yes")
+  when: (setupNFS == True or setupNFS == "yes")
