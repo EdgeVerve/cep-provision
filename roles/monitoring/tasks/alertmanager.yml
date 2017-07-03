@@ -22,5 +22,5 @@
          --mount target=/config,source={{cepfolder}}/cep/alertmanager,type=bind
          -e SERVICE_PORTS="9093" 
          -e VIRTUAL_HOST="https://alertmanager.{{domainname}},alertmanager.{{domainname}}" 
-         {{ alertmanager }}
+         {{ alertmanager }} -config.file=/config/alertmanager.conf
   when: (setupNFS == True or setupNFS == "yes")
