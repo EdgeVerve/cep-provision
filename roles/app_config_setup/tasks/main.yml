@@ -70,9 +70,6 @@
     -
       dest: "{{cepfolder}}/cep/alertmanager/alertmanager.conf"
       src: "prometheus/alertmanager.conf"
-    -
-      dest: "{{cepfolder}}/cep/cep-portal/endpoint-jsonArr.json"
-      src: "cep-portal/endpoint-jsonArr.j2"
   register: prom_conf_changed
   when: installmonitor == True or installmonitor == "yes"
   
@@ -83,6 +80,6 @@
       dest: "{{cepfolder}}/cep/cep-portal/endpoint-jsonArr.json"
       src: "cep-portal/endpoint-jsonArr.j2"
   register: cep_conf_changed
-  when: installmonitor == True or installmonitor == "yes"
+  when: installcepui == True or installcepui == "yes"
  
 
