@@ -63,6 +63,10 @@
 - name: copy domain.crt as ca.crt into /etc/docker/certs.d/{{ceppubregdomainname}} of each swarm node
   template: src='sslcertificates/{{ceppubregdomainname}}.crt' dest=/etc/docker/certs.d/{{ceppubregdomainname}}/{{ceppubregdomainname}}.ca.crt
   when: ceppubregip != ""
+
+- name: Register Server Host Name
+  shell: echo $HOSTNAME
+  register: server_hostname
   
 - name: Make hosts file entry of swarm manager for each boxes
   lineinfile: dest=/etc/hosts line="{{hostvars[item]['inventory_hostname']}}  machine-{{hostvars[item]['inventory_hostname'] |  regex_replace('\\.', '-') }}.{{domainname}}"
