@@ -50,11 +50,15 @@
   file: path={{cepfolder}}/cep/prometheus state=directory
   when: installmonitor == True or installmonitor == "yes"
 
+- name: Create cep-portal folder for configuration
+  file: path={{cepfolder}}/cep/cep-portal state=directory
+
+
 - name: Create alertmanager folder for configuration
   file: path={{cepfolder}}/cep/alertmanager state=directory
   when: installmonitor == True or installmonitor == "yes"
   
-- name: Copy config files
+- name: Copy config files for prometheus
   template: "src={{item.src}} dest={{item.dest}}"
   with_items:
     -
@@ -68,4 +72,14 @@
       src: "prometheus/alertmanager.conf"
   register: prom_conf_changed
   when: installmonitor == True or installmonitor == "yes"
+  
+- name: Copy config files for cep-portal
+  template: "src={{item.src}} dest={{item.dest}}"
+  with_items:
+    -
+      dest: "{{cepfolder}}/cep/cep-portal/endpoint-jsonArr.json"
+      src: "cep-portal/endpoint-jsonArr.j2"
+  register: cep_conf_changed
+  when: installcepui == True or installcepui == "yes"
+ 
 

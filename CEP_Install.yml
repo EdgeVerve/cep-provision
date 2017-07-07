@@ -27,7 +27,7 @@
       default: "no"
       private: no
     
-    - name: NFSSharepath
+    - name: NFSSharePath
       prompt: "Specify NFS Server share Folder (required if NFS Server setup is yes)"
       private: no      
       
@@ -66,7 +66,7 @@
         installgraylog: "{{cepGraylog}}"
         installmonitor: "{{cepmon}}"
         setupNFS: "{{setupNFS}}"
-        NFSSharePath: "{{NFSSharepath}}" 
+        NFSSharePath: "{{NFSSharePath}}" 
 
 #Generate certificates
 - hosts:

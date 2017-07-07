@@ -54,8 +54,13 @@ class MyHandler(BaseHTTPRequestHandler):
                 return
 
             needLvm = query_components["NeedLVM"][0]
-            lvmVol = query_components["LVMVolume"][0]
-            yumUpd = query_components["YumUpdate"][0]
+            lvmVol = ''
+            if 'LVMVolume' in query_components.keys():
+                lvmVol = query_components["LVMVolume"][0]
+            nfsReqd = query_components["NFSReqd"][0]
+            nfsDir = ''
+            if 'NFSDir' in query_components.keys():
+                nfsDir = query_components["NFSDir"][0]
             domainName = query_components["DomainName"][0]
             cepFolder = query_components["CEPFolder"][0]
             gitlab = query_components["InstallGitlab"][0]
@@ -63,7 +68,7 @@ class MyHandler(BaseHTTPRequestHandler):
             cepMon = query_components["CEPMon"][0]
             grayLog = query_components["GrayLog"][0]
 
-            cmd='no_proxy=localhost,127.0.0.1,registry.' + domainName + ' ANSIBLE_SCP_IF_SSH=y ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook --flush-cache CEP_Uninstall.yml -i Inventory_CEP --extra-vars "CONFIRM=yes DomainName=' + domainName + ' DirectLVMstorage=' + needLvm + ' cepfolder=' + cepFolder + '"'
+            cmd='no_proxy=localhost,127.0.0.1,registry.' + domainName + ' ANSIBLE_SCP_IF_SSH=y ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook --flush-cache CEP_Uninstall.yml -i Inventory_CEP --extra-vars "CONFIRM=yes DomainName=' + domainName + ' DirectLVMstorage=' + needLvm + ' setupNFS=' + nfsReqd + ' NFSSharePath=' + nfsDir + ' cepfolder=' + cepFolder + '"'
             print(cmd)
             self.send_response(200)
             self.send_header('Content-type','text/html')
@@ -86,8 +91,13 @@ class MyHandler(BaseHTTPRequestHandler):
                 return
  
             needLvm = query_components["NeedLVM"][0]
-            lvmVol = query_components["LVMVolume"][0]
-            yumUpd = query_components["YumUpdate"][0]
+            lvmVol = ''
+            if 'LVMVolume' in query_components.keys():
+               lvmVol = query_components["LVMVolume"][0]
+            nfsReqd = query_components["NFSReqd"][0]
+            nfsDir = ''
+            if 'NFSDir' in query_components.keys():
+                nfsDir = query_components["NFSDir"][0]
             domainName = query_components["DomainName"][0]
             cepFolder = query_components["CEPFolder"][0]
             gitlab = query_components["InstallGitlab"][0]
@@ -95,7 +105,7 @@ class MyHandler(BaseHTTPRequestHandler):
             cepMon = query_components["CEPMon"][0]
             grayLog = query_components["GrayLog"][0]
 
-            cmd='no_proxy=localhost,127.0.0.1,registry.' + domainName + ' ANSIBLE_SCP_IF_SSH=y ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook --flush-cache CEP_Install.yml -i Inventory_CEP --extra-vars "YumUpdate=' + yumUpd + ' DomainName=' + domainName + ' cepfolder=' + cepFolder + ' InstallGitlab=' + gitlab +' cepUI=' + cepUi + ' cepmon=' + cepMon + ' cepGraylog=' + grayLog + ' DirectLVMstorage=' + needLvm + ' Docker_storage_devs=' + lvmVol + '"'
+            cmd='no_proxy=localhost,127.0.0.1,registry.' + domainName + ' ANSIBLE_SCP_IF_SSH=y ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook --flush-cache CEP_Install.yml -i Inventory_CEP --extra-vars "DomainName=' + domainName + ' cepfolder=' + cepFolder + ' InstallGitlab=' + gitlab +' cepUI=' + cepUi + ' cepmon=' + cepMon + ' cepGraylog=' + grayLog + ' DirectLVMstorage=' + needLvm + ' setupNFS=' + nfsReqd + ' NFSSharePath=' + nfsDir + ' Docker_storage_devs=' + lvmVol + '"'
             print(cmd)
             self.send_response(200)
             self.send_header('Content-type','text/html')

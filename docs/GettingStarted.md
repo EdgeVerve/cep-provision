@@ -65,7 +65,7 @@ It will ask for inputs. Here's the description of each question it asks
 Provide responses for the prompts. To run as a single command instead of interactive prompts, use the below command with preset inputs.
 
 ```
-ANSIBLE_SCP_IF_SSH=y ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook --flush-cache CEP_Install.yml -i Inventory_CEP -c paramiko  --extra-vars "DomainName=cepapp.qa cepfolder=/data InstallGitlab= cepUI=yes cepmon=yes cepGraylog=yes DirectLVMstorage=yes Docker_storage_devs=/dev/sdb setupNFS= NFSSharepath="
+ANSIBLE_SCP_IF_SSH=y ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook --flush-cache CEP_Install.yml -i Inventory_CEP -c paramiko  --extra-vars "DomainName=cepapp.qa cepfolder=/data InstallGitlab= cepUI=yes cepmon=yes cepGraylog=yes DirectLVMstorage=yes Docker_storage_devs=/dev/sdb setupNFS= NFSSharePath="
 ```
 
 * ANSIBLE_SCP_IF_SSH - set to Y if SFTP is not enabled in the remote machines.

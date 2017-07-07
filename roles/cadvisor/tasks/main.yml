@@ -9,6 +9,7 @@
   unarchive:
     src: "roles/cadvisor/templates/cadvisor.tar.gz"
     dest: "{{cepfolder}}/cep/cAdvisor/"
+    mode: u+x
       
 - name: Copy cadvisor service file
   template: src=cadvisor.service dest=/usr/lib/systemd/system/
