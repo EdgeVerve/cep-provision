@@ -1,0 +1,12 @@
+[
+{% set comma = joiner(",") %}{% for host in groups['AllHosts'] %}{{ comma() }}
+  {
+    "Name": "{{hostvars[host]['server_hostname'].stdout}}",
+    "URL": "tcp://machine-{{hostvars[host]['inventory_hostname'] |  regex_replace('\\.', '-') }}.{{domainname}}:2375",
+    "TLS": true,
+    "TLSCACert": "/certs/ca.pem",
+    "TLSCert": "/certs/cert.pem",
+    "TLSKey": "/certs/key.pem"
+  }
+{% endfor %}
+]
