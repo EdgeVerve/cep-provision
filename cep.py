@@ -68,7 +68,7 @@ class MyHandler(BaseHTTPRequestHandler):
             cepMon = query_components["CEPMon"][0]
             grayLog = query_components["GrayLog"][0]
 
-            cmd='no_proxy=localhost,127.0.0.1,registry.' + domainName + ' ANSIBLE_SCP_IF_SSH=y ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook --flush-cache CEP_Uninstall.yml -i Inventory_CEP --extra-vars "CONFIRM=yes DomainName=' + domainName + ' DirectLVMstorage=' + needLvm + ' setupNFS=' + nfsReqd + ' NFSSharepath=' + nfsDir + ' cepfolder=' + cepFolder + '"'
+            cmd='no_proxy=localhost,127.0.0.1,registry.' + domainName + ' ANSIBLE_SCP_IF_SSH=y ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook --flush-cache CEP_Uninstall.yml -i Inventory_CEP --extra-vars "CONFIRM=yes DomainName=' + domainName + ' DirectLVMstorage=' + needLvm + ' setupNFS=' + nfsReqd + ' NFSSharePath=' + nfsDir + ' cepfolder=' + cepFolder + '"'
             print(cmd)
             self.send_response(200)
             self.send_header('Content-type','text/html')
@@ -105,7 +105,7 @@ class MyHandler(BaseHTTPRequestHandler):
             cepMon = query_components["CEPMon"][0]
             grayLog = query_components["GrayLog"][0]
 
-            cmd='no_proxy=localhost,127.0.0.1,registry.' + domainName + ' ANSIBLE_SCP_IF_SSH=y ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook --flush-cache CEP_Install.yml -i Inventory_CEP --extra-vars "DomainName=' + domainName + ' cepfolder=' + cepFolder + ' InstallGitlab=' + gitlab +' cepUI=' + cepUi + ' cepmon=' + cepMon + ' cepGraylog=' + grayLog + ' DirectLVMstorage=' + needLvm + ' setupNFS=' + nfsReqd + ' NFSSharepath=' + nfsDir + ' Docker_storage_devs=' + lvmVol + '"'
+            cmd='no_proxy=localhost,127.0.0.1,registry.' + domainName + ' ANSIBLE_SCP_IF_SSH=y ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook --flush-cache CEP_Install.yml -i Inventory_CEP --extra-vars "DomainName=' + domainName + ' cepfolder=' + cepFolder + ' InstallGitlab=' + gitlab +' cepUI=' + cepUi + ' cepmon=' + cepMon + ' cepGraylog=' + grayLog + ' DirectLVMstorage=' + needLvm + ' setupNFS=' + nfsReqd + ' NFSSharePath=' + nfsDir + ' Docker_storage_devs=' + lvmVol + '"'
             print(cmd)
             self.send_response(200)
             self.send_header('Content-type','text/html')
