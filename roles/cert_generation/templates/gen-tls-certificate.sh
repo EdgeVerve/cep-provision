@@ -87,7 +87,7 @@ fi
 
 echo "Creating CA-cert"
 if [ ! "$caGenNotNeeded" = true ]; then
-  openssl req -x509 -sha1 -new -nodes -key $target/ca-priv-key.pem -days 10000 -out $target/ca.pem -subj /CN=docker-CA-$environment
+  openssl req -x509 -sha256 -new -nodes -key $target/ca-priv-key.pem -days 10000 -out $target/ca.pem -subj /CN=docker-CA-$environment
 fi 
 
 echo "Creating docker-priv-key"
@@ -97,5 +97,5 @@ echo "Creating CSR"
 openssl req -new -key $target/key.pem -out $target/cert.csr -subj /CN=docker-server-client-$environment -config /tmp/openssl.cnf
 
 echo "Creating certificate"
-openssl x509 -sha1 -req -in $target/cert.csr -CA $target/ca.pem -CAkey $target/ca-priv-key.pem -CAcreateserial -out $target/cert.pem -days 3650 -extensions v3_req -extfile /tmp/openssl.cnf
+openssl x509 -sha256 -req -in $target/cert.csr -CA $target/ca.pem -CAkey $target/ca-priv-key.pem -CAcreateserial -out $target/cert.pem -days 3650 -extensions v3_req -extfile /tmp/openssl.cnf
 
