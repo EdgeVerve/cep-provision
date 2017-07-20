@@ -11,7 +11,7 @@
       src: "cleanup_scripts/cleanup.sh"
 
 - name: Make script executable
-  shell: "sh chmod +x {{cepfolder}}/cep/cleanup-cron-script/cleanup.sh"
+  shell: "chmod +x {{cepfolder}}/cep/cleanup-cron-script/cleanup.sh"
 
 - name: Adding crontab entry for cleanup
   lineinfile:
