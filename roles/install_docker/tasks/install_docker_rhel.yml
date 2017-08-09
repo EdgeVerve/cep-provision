@@ -34,6 +34,7 @@
     enablerepo: epel
   with_items:
     #- { name: 'epel-release' }
+    - { name: 'firewalld'}
     - { name: 'python-pip' }      
   environment:
     http_proxy: "{{http_proxy}}"
@@ -48,7 +49,6 @@
   with_items:
     - { name: 'docker-py'}
     - { name: 'pyYAML'}
-    - { name: 'firewalld'}
     #- { name: 'docker-compose'}
   environment:
     http_proxy: "{{http_proxy}}"
