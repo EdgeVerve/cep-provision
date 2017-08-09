@@ -8,19 +8,19 @@
   shell: docker volume create gitlab-backup
   when: existing_registry_op.stdout == "0"
 
-- name: create {{cepfolder}}/cep/cep-data/gitlab/secret_backup folder
-  file: path={{cepfolder}}/cep/cep-data/gitlab/secret_backup state=directory 
+- name: create {{cepfolder}}/cep-data/gitlab/secret_backup folder
+  file: path={{cepfolder}}/cep-data/gitlab/secret_backup state=directory 
   
-- name: create {{cepfolder}}/cep/cep-data/gitlab/opt_gitlab folder
-  file: path={{cepfolder}}/cep/cep-data/gitlab/opt_gitlab state=directory 
+- name: create {{cepfolder}}/cep-data/gitlab/opt_gitlab folder
+  file: path={{cepfolder}}/cep-data/gitlab/opt_gitlab state=directory 
 
 - name: spin a single instance of gitlab in swarm
   shell: >
          docker service create --with-registry-auth 
          --name cep_gitlab 
          --network router_network 
-         --mount target=/var/opt/gitlab,source={{cepfolder}}/cep/cep-data/gitlab/opt_gitlab,type=bind
-         --mount target=/secret/gitlab/backups,source={{cepfolder}}/cep/cep-data/gitlab/secret_backup,type=bind
+         --mount target=/var/opt/gitlab,source={{cepfolder}}/cep-data/gitlab/opt_gitlab,type=bind
+         --mount target=/secret/gitlab/backups,source={{cepfolder}}/cep-data/gitlab/secret_backup,type=bind
          -e SERVICE_PORTS="80" 
          -e FORCE_SSL=yes 
          -e VIRTUAL_HOST="https://gitlab.{{domainname}},gitlab.{{domainname}}" 
@@ -34,8 +34,8 @@
          docker service create --with-registry-auth 
          --name cep_gitlab 
          --network router_network 
-         --mount target=/var/opt/gitlab,source={{cepfolder}}/cep/cep-data/gitlab/opt_gitlab,type=bind
-         --mount target=/secret/gitlab/backups,source={{cepfolder}}/cep/cep-data/gitlab/secret_backup,type=bind
+         --mount target=/var/opt/gitlab,source={{cepfolder}}/cep-data/gitlab/opt_gitlab,type=bind
+         --mount target=/secret/gitlab/backups,source={{cepfolder}}/cep-data/gitlab/secret_backup,type=bind
          --constraint "node.hostname == $HOSTNAME"
          -e SERVICE_PORTS="80" 
          -e FORCE_SSL=yes 

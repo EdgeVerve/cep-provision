@@ -52,7 +52,7 @@
   
 - name: Unmount NFS share folder
   mount:
-    path: "{{cepfolder}}/cep/cep-data" 
+    path: "{{cepfolder}}/cep-data" 
     src: "{{  hostvars[groups['NFSServer'][0]]['inventory_hostname'] }}:{{NFSSharePath}}" 
     fstype: nfs4
     opts: nofail,auto,noatime,rw,user 

@@ -6,7 +6,7 @@
          --name cep-prometheus-server
          --network router_network 
          --mount target=/config,source={{cepfolder}}/cep/prometheus,type=bind
-         --mount target=/prometheus,source={{cepfolder}}/cep/cep-data/prometheus,type=bind
+         --mount target=/prometheus,source={{cepfolder}}/cep-data/prometheus,type=bind
          -e FORCE_SSL=yes 
          -e SERVICE_PORTS="9090" 
          -e VIRTUAL_HOST="https://prometheus.{{domainname}},prometheus.{{domainname}}" 
@@ -24,7 +24,7 @@
          --name cep-prometheus-server
          --network router_network 
          --mount target=/config,source={{cepfolder}}/cep/prometheus,type=bind
-         --mount target=/prometheus,source={{cepfolder}}/cep/cep-data/prometheus,type=bind
+         --mount target=/prometheus,source={{cepfolder}}/cep-data/prometheus,type=bind
          -e FORCE_SSL=yes 
          -e SERVICE_PORTS="9090" 
          -e VIRTUAL_HOST="https://prometheus.{{domainname}},prometheus.{{domainname}}" 
