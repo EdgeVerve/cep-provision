@@ -40,7 +40,7 @@
     https_proxy: "{{https_proxy}}"
     no_proxy: "{{no_proxy}}"
 
-- name: Install docker Pre-Requisite - docker-py
+- name: Install docker Pre-Requisite 
   pip:
     name: "{{item.name}}"
     state: latest
@@ -48,6 +48,7 @@
   with_items:
     - { name: 'docker-py'}
     - { name: 'pyYAML'}
+    - { name: 'firewalld'}
     #- { name: 'docker-compose'}
   environment:
     http_proxy: "{{http_proxy}}"

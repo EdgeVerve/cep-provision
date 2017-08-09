@@ -26,11 +26,15 @@
   register: shout
   when: directLVMstorage == True or directLVMstorage == "yes"
   
-- name: Adding mounting volume at startup (fstab entry)
-  lineinfile: 
-    line: /dev/{{docker_storage_vg}}/{{docker_storage_datadisk_name}} {{cepfolder}}/cep ext4  nofail,auto,noatime,rw,user    0   0
-    path: /etc/fstab
-    state: present
+- name: mounting datadisk 
+  mount:
+    path: "{{cepfolder}}/cep" 
+    src: "/dev/{{docker_storage_vg}}/{{docker_storage_datadisk_name}}" 
+    fstype: ext4
+    opts: nofail,auto,noatime,rw,user,exec
+    state: mounted    
+  when: directLVMstorage == True or directLVMstorage == "yes"
+
 
 - debug: msg="{{ shout.stdout_lines }}"  
   when: directLVMstorage == True or directLVMstorage == "yes"
