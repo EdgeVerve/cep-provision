@@ -2,7 +2,7 @@
 
 - name: spin prometheus container
   shell: >
-         docker service create
+         docker service create  --detach false
          --name cep-prometheus-server
          --network router_network 
          --mount target=/config,source={{cepfolder}}/cep/prometheus,type=bind
@@ -20,7 +20,7 @@
   
 - name: spin prometheus container
   shell: >
-         docker service create
+         docker service create  --detach false
          --name cep-prometheus-server
          --network router_network 
          --mount target=/config,source={{cepfolder}}/cep/prometheus,type=bind

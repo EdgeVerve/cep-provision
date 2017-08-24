@@ -19,5 +19,5 @@
   when: existing_graylog_op.stdout == "0"  
 
 - name: spin graylog container
-  shell: docker stack deploy -c {{cepfolder}}/cep/graylog/docker-compose.yml cep_graylog         
+  shell: docker stack deploy -c {{cepfolder}}/cep/graylog/docker-compose.yml cep_graylog --with-registry-auth      
   when: existing_graylog_op.stdout == "0"

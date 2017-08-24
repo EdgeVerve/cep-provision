@@ -16,7 +16,7 @@
 
 - name: spin a single instance of gitlab in swarm
   shell: >
-         docker service create --with-registry-auth 
+         docker service create  --detach false --with-registry-auth 
          --name cep_gitlab 
          --network router_network 
          --mount target=/var/opt/gitlab,source={{cepfolder}}/cep-data/gitlab/opt_gitlab,type=bind
@@ -31,7 +31,7 @@
   
 - name: spin a single instance of gitlab in swarm
   shell: >
-         docker service create --with-registry-auth 
+         docker service create  --detach false --with-registry-auth 
          --name cep_gitlab 
          --network router_network 
          --mount target=/var/opt/gitlab,source={{cepfolder}}/cep-data/gitlab/opt_gitlab,type=bind
