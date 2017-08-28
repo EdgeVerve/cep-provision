@@ -8,7 +8,7 @@
 
 - name: spin grafana service
   shell: >
-         docker service create  --detach false --with-registry-auth 
+         docker service create  --detach=false --with-registry-auth 
          --mount target=/var/lib/grafana,source={{cepfolder}}/cep-data/grafana,type=bind
          -e FORCE_SSL=yes 
          -e SERVICE_PORTS="3000" 
@@ -23,7 +23,7 @@
 
 - name: spin grafana service
   shell: >
-         docker service create  --detach false --with-registry-auth 
+         docker service create  --detach=false --with-registry-auth 
          --mount target=/var/lib/grafana,source={{cepfolder}}/cep-data/grafana,type=bind
          -e FORCE_SSL=yes 
          -e SERVICE_PORTS="3000" 
