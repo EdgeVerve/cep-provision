@@ -30,8 +30,8 @@
   yum:
     name: "{{item.name}}"
     state: present
-    disablerepo: "*"
-    enablerepo: epel
+    #disablerepo: "*"
+    #enablerepo: epel
   with_items:
     #- { name: 'epel-release' }
     - { name: 'firewalld'}
