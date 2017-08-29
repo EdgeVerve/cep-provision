@@ -2,11 +2,11 @@
 
 - name: spin alertmanager container
   shell: >
-         docker service create
+         docker service create  --detach=false
          --name cep-alertmanager
          --network router_network 
          --constraint "node.hostname == $HOSTNAME"
-         --mount target=/alertmanager,source={{cepfolder}}/cep/cep-data/alertmanager,type=bind
+         --mount target=/alertmanager,source={{cepfolder}}/cep-data/alertmanager,type=bind
          --mount target=/config,source={{cepfolder}}/cep/alertmanager,type=bind
          -e SERVICE_PORTS="9093" 
          -e VIRTUAL_HOST="https://alertmanager.{{domainname}},alertmanager.{{domainname}}" 
@@ -15,10 +15,10 @@
   
 - name: spin alertmanager container
   shell: >
-         docker service create
+         docker service create  --detach=false
          --name cep-alertmanager
          --network router_network 
-         --mount target=/alertmanager,source={{cepfolder}}/cep/cep-data/alertmanager,type=bind
+         --mount target=/alertmanager,source={{cepfolder}}/cep-data/alertmanager,type=bind
          --mount target=/config,source={{cepfolder}}/cep/alertmanager,type=bind
          -e SERVICE_PORTS="9093" 
          -e VIRTUAL_HOST="https://alertmanager.{{domainname}},alertmanager.{{domainname}}" 

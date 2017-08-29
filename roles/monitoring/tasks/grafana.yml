@@ -3,13 +3,13 @@
 - name: unarchive grafana data files
   copy: 
     src: "roles/monitoring/templates/grafana/grafana.db"
-    dest: "{{cepfolder}}/cep/cep-data/grafana/grafana.db"
+    dest: "{{cepfolder}}/cep-data/grafana/grafana.db"
 
 
 - name: spin grafana service
   shell: >
-         docker service create --with-registry-auth 
-         --mount target=/var/lib/grafana,source={{cepfolder}}/cep/cep-data/grafana,type=bind
+         docker service create  --detach=false --with-registry-auth 
+         --mount target=/var/lib/grafana,source={{cepfolder}}/cep-data/grafana,type=bind
          -e FORCE_SSL=yes 
          -e SERVICE_PORTS="3000" 
          -e VIRTUAL_HOST="https://grafana.{{domainname}},grafana.{{domainname}}" 
@@ -23,8 +23,8 @@
 
 - name: spin grafana service
   shell: >
-         docker service create --with-registry-auth 
-         --mount target=/var/lib/grafana,source={{cepfolder}}/cep/cep-data/grafana,type=bind
+         docker service create  --detach=false --with-registry-auth 
+         --mount target=/var/lib/grafana,source={{cepfolder}}/cep-data/grafana,type=bind
          -e FORCE_SSL=yes 
          -e SERVICE_PORTS="3000" 
          -e VIRTUAL_HOST="https://grafana.{{domainname}},grafana.{{domainname}}" 

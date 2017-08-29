@@ -30,24 +30,25 @@
   yum:
     name: "{{item.name}}"
     state: present
-    disablerepo: "*"
-    enablerepo: epel
+    #disablerepo: "*"
+    #enablerepo: epel
   with_items:
     #- { name: 'epel-release' }
+    - { name: 'firewalld'}
     - { name: 'python-pip' }      
   environment:
     http_proxy: "{{http_proxy}}"
     https_proxy: "{{https_proxy}}"
     no_proxy: "{{no_proxy}}"
 
-- name: Install docker Pre-Requisite - docker-py
+- name: Install docker Pre-Requisite 
   pip:
     name: "{{item.name}}"
     state: latest
     #version: "{{item.version}}"
   with_items:
     - { name: 'docker-py'}
-    - { name: 'pyYAML'}
+#    - { name: 'pyYAML'}
     #- { name: 'docker-compose'}
   environment:
     http_proxy: "{{http_proxy}}"

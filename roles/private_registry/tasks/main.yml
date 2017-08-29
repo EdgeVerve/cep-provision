@@ -7,10 +7,10 @@
   
 - name: spin registry container
   shell: >
-         docker service create --with-registry-auth 
+         docker service create  --detach=false --with-registry-auth 
          --name cep_registry 
          --network router_network
-         --mount target=/var/lib/registry,source={{cepfolder}}/cep/cep-data/registry,type=bind
+         --mount target=/var/lib/registry,source={{cepfolder}}/cep-data/registry,type=bind
          --constraint "node.hostname == $HOSTNAME"
          -e REGISTRY_HTTP_SECRET=secret
          -e REGISTRY_LOG_LEVEL=debug
@@ -22,10 +22,10 @@
   
 - name: spin registry container
   shell: >
-         docker service create --with-registry-auth 
+         docker service create  --detach=false --with-registry-auth 
          --name cep_registry 
          --network router_network
-         --mount target=/var/lib/registry,source={{cepfolder}}/cep/cep-data/registry,type=bind
+         --mount target=/var/lib/registry,source={{cepfolder}}/cep-data/registry,type=bind
          -e REGISTRY_HTTP_SECRET=secret
          -e REGISTRY_LOG_LEVEL=debug
          -e FORCE_SSL=yes 

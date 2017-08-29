@@ -12,12 +12,12 @@
   when: setupNFS == True or setupNFS == "yes"
 
 - name: Create folder for cep data
-  file: path={{cepfolder}}/cep/cep-data state=directory
+  file: path={{cepfolder}}/cep-data state=directory
     
 #mount -t nfs {{nfsserver_ip}}:{{nfsshare}}/evfpaasshare /etc/evfpaasshare
 - name: mount NFS share folder
   mount:
-    path: "{{cepfolder}}/cep/cep-data" 
+    path: "{{cepfolder}}/cep-data" 
     src: "{{  hostvars[groups['NFSServer'][0]]['inventory_hostname'] }}:{{NFSSharePath}}" 
     fstype: nfs4
     opts: nofail,auto,noatime,rw,user 
@@ -25,25 +25,25 @@
   when: setupNFS == True or setupNFS == "yes"
 
 - name: Create backup folder for registry
-  file: path={{cepfolder}}/cep/cep-data/registry state=directory
+  file: path={{cepfolder}}/cep-data/registry state=directory
   
 - name: Create backup folder for cep-portal
-  file: path={{cepfolder}}/cep/cep-data/cep-portal state=directory
+  file: path={{cepfolder}}/cep-data/cep-portal state=directory
 
 - name: Create backup folder for prometheus
-  file: path={{cepfolder}}/cep/cep-data/prometheus state=directory
+  file: path={{cepfolder}}/cep-data/prometheus state=directory
   when: installmonitor == True or installmonitor == "yes"
   
 - name: Create backup folder for alertmanager
-  file: path={{cepfolder}}/cep/cep-data/alertmanager state=directory
+  file: path={{cepfolder}}/cep-data/alertmanager state=directory
   when: installmonitor == True or installmonitor == "yes"
 
 - name: Create backup folder for grafana
-  file: path={{cepfolder}}/cep/cep-data/grafana state=directory  
+  file: path={{cepfolder}}/cep-data/grafana state=directory  
   when: installmonitor == True or installmonitor == "yes"
 
 - name: Create backup folder for gitlab
-  file: path={{cepfolder}}/cep/cep-data/gitlab state=directory
+  file: path={{cepfolder}}/cep-data/gitlab state=directory
   when: installgitlab == True or installgitlab == "yes"
   
 - name: Create prometheus folder for configuration

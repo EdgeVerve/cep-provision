@@ -7,13 +7,14 @@
   
 - name: spin CEP Portal container
   shell: >
-         docker service create --with-registry-auth 
+         docker service create  --detach=false --with-registry-auth  
          --name cep_portal 
          --network router_network
-         --mount target=/data,source={{cepfolder}}/cep/cep-data/cep-portal,type=bind
+         --mount target=/data,source={{cepfolder}}/cep-data/cep-portal,type=bind
          --mount target=/config,source={{cepfolder}}/cep/cep-portal,type=bind
          --mount target=/etc/hosts,source=/etc/hosts,type=bind,ro=1
          --mount target=/certs,source={{cepfolder}}/cep/certificates,type=bind,ro=1
+         --dns 8.8.8.8
          --constraint "node.role == manager" 
          -e FORCE_SSL=yes
          -e SERVICE_PORTS="9000" 
@@ -24,10 +25,10 @@
   
 - name: spin CEP Portal container
   shell: >
-         docker service create --with-registry-auth 
+         docker service create  --detach=false --with-registry-auth 
          --name cep_portal 
          --network router_network
-         --mount target=/data,source={{cepfolder}}/cep/cep-data/cep-portal,type=bind
+         --mount target=/data,source={{cepfolder}}/cep-data/cep-portal,type=bind
          --mount target=/config,source={{cepfolder}}/cep/cep-portal,type=bind
          --mount target=/etc/hosts,source=/etc/hosts,type=bind,ro=1
          --mount target=/certs,source={{cepfolder}}/cep/certificates,type=bind,ro=1
