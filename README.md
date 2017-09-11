@@ -39,11 +39,6 @@ put A-record for server ip for *.<domain\> and URL's can be accessed through it.
 ## More information
 Please visit [oeCloud.io](https://www.oecloud.io)
 
-## Known Issues
-
-1. Currently cep components needing persistence have been constrained to one box. So currently that counts as a 
-   single point of failure. We are working on it.
-
 ## License
 The project is licensed under MIT License, See [LICENSE](./LICENSE) for more details.
 
