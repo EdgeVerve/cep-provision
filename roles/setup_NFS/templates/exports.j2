@@ -13,5 +13,5 @@
 #{% endfor %}
 
 {% for host in groups['AllHosts'] %}
- {{NFSSharePath}} {{ hostvars[host]['inventory_hostname'] }}(rw,sync,no_root_squash)
+ {{nfsSharePath}} {{ hostvars[host]['inventory_hostname'] }}(rw,sync,no_root_squash)
 {% endfor %}

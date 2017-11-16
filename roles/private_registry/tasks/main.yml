@@ -35,10 +35,13 @@
   when: existing_registry_op.stdout == "0" and (setupNFS == True or setupNFS == "yes")
   
 - name : Pull app base images from cep registry - {{ceppubregdomainname}}
-  command: docker pull "{{ceppubregdomainname}}/{{ item.name }}:{{ item.tag }}"
-  with_items:
-    - { name: "{{public_alpine_node}}", tag: "{{public_node_tag}}" }
-    - { name: "{{public_alpine_mongo}}", tag: "{{public_mongo_tag}}" }
+  block:
+   - command: docker pull "{{ceppubregdomainname}}/{{ item.name }}:{{ item.tag }}"
+     with_items:
+       - { name: "{{public_alpine_node}}", tag: "{{public_node_tag}}" }
+       - { name: "{{public_alpine_mongo}}", tag: "{{public_mongo_tag}}" }
+  rescue:
+   - fail: msg="Could not connect/pull from {{ceppubregdomainname}}. Please check connectivity/proxy settings"
      
 - name: private registry entry in /etc/hosts of each node - {{  inventory_hostname }} {{registryname}}
   lineinfile: dest=/etc/hosts line="{{ inventory_hostname }} {{registryname}}" state=present
@@ -53,11 +56,14 @@
     - { public_name: "{{public_alpine_mongo}}", public_tag: "{{public_mongo_tag}}", name: "{{alpine_mongo}}", tag: "{{mongo_tag}}" }  
   
 - name : push images to private registry - {{registryname}}
-  command: docker push "{{registryname}}/{{ item.name }}:{{ item.tag }}"
-  with_items:
-    - { name: "{{alpine_node}}", tag: "{{node_tag}}" }
-    - { name: "{{alpine_mongo}}", tag: "{{mongo_tag}}" }
-    
+  block:
+   - command: docker push "{{registryname}}/{{ item.name }}:{{ item.tag }}"
+     with_items:
+       - { name: "{{alpine_node}}", tag: "{{node_tag}}" }
+       - { name: "{{alpine_mongo}}", tag: "{{mongo_tag}}" }
+  rescue:
+   - fail: msg="Could not connect/push to {{registryname}}. Please check if your private domain is in no_proxy env if proxy is present" 
+   
 - name: clean up images in host machines
   docker_image:
     name: "{{ item.name }}"

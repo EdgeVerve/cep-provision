@@ -1,0 +1,38 @@
+# Alert for any instance that is unreachable for >5 minutes.
+ALERT InstanceDown
+  IF up == 0
+  FOR 5m
+  LABELS { severity = "page" }
+  ANNOTATIONS {
+    summary = "Instance {{ '{{' }} $labels.instance {{ '}}' }} down",
+    description = "{{ '{{' }} $labels.instance {{ '}}' }} of job {{ '{{' }} $labels.job {{ '}}' }} has been down for more than 5 minutes.",
+  }
+
+ALERT MemoryUpAlert
+  IF avg(container_memory_usage_bytes{container_label_service_autoscale_up_memory !=""}/container_spec_memory_limit_bytes{container_label_service_autoscale_up_memory !=""}) by (container_label_com_docker_swarm_service_name) KEEP_COMMON * 100 > 75
+  FOR 30s
+  LABELS { severity = "memory"  }
+  ANNOTATIONS {
+    value = "{{ '{{' }} $value  {{ '}}' }}"
+  }
+
+ALERT MemoryDownAlert
+  IF avg(container_memory_usage_bytes{container_label_service_autoscale_up_memory !=""}/container_spec_memory_limit_bytes{container_label_service_autoscale_up_memory !=""}) by (container_label_com_docker_swarm_service_name) KEEP_COMMON * 100 < 65
+  FOR 30s
+  LABELS { severity = "memory"  }
+  ANNOTATIONS {
+    value = "{{ '{{' }} $value  {{ '}}' }}"
+  }
+
+
+ALERT CPUUpAlert
+  IF avg(sum(rate(container_cpu_usage_seconds_total{container_label_service_autoscale_down_cpu!=""}[1m]) / IGNORING(cpu) GROUP_LEFT(name) (container_spec_cpu_quota{container_label_service_autoscale_down_cpu!=""} / 100000)) BY (name) KEEP_COMMON ) BY (container_label_com_docker_swarm_service_name) KEEP_COMMON * 100 > 75
+  FOR 30s
+  LABELS {severity="cpu"}
+  ANNOTATIONS {value="{{ '{{' }} $value {{ '}}' }}"}
+
+ALERT CPUDownAlert
+  IF avg(sum(rate(container_cpu_usage_seconds_total{container_label_service_autoscale_down_cpu!=""}[1m]) / IGNORING(cpu) GROUP_LEFT(name) (container_spec_cpu_quota{container_label_service_autoscale_down_cpu!=""} / 100000)) BY (name) KEEP_COMMON ) BY (container_label_com_docker_swarm_service_name) KEEP_COMMON   * 100 < 15
+  FOR 30s
+  LABELS {severity="cpu"}
+  ANNOTATIONS {value="{{ '{{' }} $value {{ '}}' }}"}

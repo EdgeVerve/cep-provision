@@ -6,25 +6,15 @@
 - name: Check Package install
   block:
    - yum:
-        name: ca-certificates
-        state: latest
+       name: ca-certificates
+       state: latest
+       update_cache: yes
      environment:
-        http_proxy: "{{http_proxy}}"
-        https_proxy: "{{https_proxy}}" 
-        no_proxy: "{{no_proxy}}"  
-     when: ansible_os_family == 'RedHat'
+       http_proxy: "{{http_proxy}}"
+       https_proxy: "{{https_proxy}}" 
+       no_proxy: "{{no_proxy}}"
+     register: yum-output
      no_log: true
-        
-   - apt:
-        name: ca-certificates
-        state: latest
-     environment:
-        http_proxy: "{{http_proxy}}"
-        https_proxy: "{{https_proxy}}" 
-        no_proxy: "{{no_proxy}}"
-     when: ansible_os_family == "Debian"
-     no_log: true
-     
    - set_fact: 
        package_installer_status: "✔ Package manager connectivity is working fine"
   rescue:
@@ -77,20 +67,15 @@
 
 - name: Check OS
   block:
-   - fail:
-     when: ansible_os_family != 'RedHat' and ansible_os_family != 'Debian'
-     no_log: true
-     
    - fail: 
-     when: ansible_os_family == 'RedHat' and (ansible_distribution_major_version | int )< 7
+     when: ansible_os_family != 'RedHat' or (ansible_distribution_major_version | int )< 7
      no_log: true
-     
    - set_fact: 
        os_status: "✔ This machine has supported OS present"
   rescue:
    - set_fact:
        failed: true
-       os_status: "✘ The only supported platforms for this release RHEL ^7, CentOS ^7, Ubuntu "
+       os_status: "✘ The only supported platforms for this release RHEL ^7, CentOS ^7 "
 
 - set_fact:
     check_result: "Passed"

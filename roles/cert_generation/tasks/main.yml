@@ -1,5 +1,4 @@
-#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
-
+  
 #Generate TLS certificates
 # If alternate IP is needed, script takes -i with List of IP in comma separated format.
 

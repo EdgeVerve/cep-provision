@@ -10,54 +10,82 @@
     https_proxy: "{{https_proxy}}" 
     no_proxy: "{{no_proxy}}"
   when: setupNFS == True or setupNFS == "yes"
-
+  tags:
+   - nfs_server_setup
+  
 - name: Create folder for cep data
   file: path={{cepfolder}}/cep-data state=directory
+  tags:
+   - private_registry
+   - cep_portal
+   - gitlab
+   - graylog
+   - monitoring
+   - nfs_server_setup
+   
     
 #mount -t nfs {{nfsserver_ip}}:{{nfsshare}}/evfpaasshare /etc/evfpaasshare
 - name: mount NFS share folder
   mount:
     path: "{{cepfolder}}/cep-data" 
-    src: "{{  hostvars[groups['NFSServer'][0]]['inventory_hostname'] }}:{{NFSSharePath}}" 
+    src: "{{  hostvars[groups['NFSServer'][0]]['inventory_hostname'] }}:{{nfsSharePath}}" 
     fstype: nfs4
     opts: nofail,auto,noatime,rw,user 
     state: mounted    
   when: setupNFS == True or setupNFS == "yes"
+  tags:
+   - nfs_server_setup
 
 - name: Create backup folder for registry
   file: path={{cepfolder}}/cep-data/registry state=directory
-  
+  tags:
+   - private_registry
+   
 - name: Create backup folder for cep-portal
   file: path={{cepfolder}}/cep-data/cep-portal state=directory
+  tags:
+   - cep_portal
 
 - name: Create backup folder for prometheus
   file: path={{cepfolder}}/cep-data/prometheus state=directory
   when: installmonitor == True or installmonitor == "yes"
+  tags:
+   - monitoring
   
 - name: Create backup folder for alertmanager
   file: path={{cepfolder}}/cep-data/alertmanager state=directory
   when: installmonitor == True or installmonitor == "yes"
-
+  tags:
+   - monitoring
 - name: Create backup folder for grafana
   file: path={{cepfolder}}/cep-data/grafana state=directory  
   when: installmonitor == True or installmonitor == "yes"
+  tags:
+   - monitoring
 
 - name: Create backup folder for gitlab
   file: path={{cepfolder}}/cep-data/gitlab state=directory
   when: installgitlab == True or installgitlab == "yes"
+  tags:
+   - gitlab
   
 - name: Create prometheus folder for configuration
   file: path={{cepfolder}}/cep/prometheus state=directory
   when: installmonitor == True or installmonitor == "yes"
-
+  tags:
+   - monitoring
+   
 - name: Create cep-portal folder for configuration
   file: path={{cepfolder}}/cep/cep-portal state=directory
-
+  tags:
+   - monitoring
 
 - name: Create alertmanager folder for configuration
   file: path={{cepfolder}}/cep/alertmanager state=directory
   when: installmonitor == True or installmonitor == "yes"
-  
+  tags:
+   - monitoring
+   
 - name: Copy config files for prometheus
   template: "src={{item.src}} dest={{item.dest}}"
   with_items:
@@ -72,7 +100,23 @@
       src: "prometheus/alertmanager.conf"
   register: prom_conf_changed
   when: installmonitor == True or installmonitor == "yes"
-  
+  tags:
+   - monitoring
+   
+- name: Copy config files for auto-scaling
+  template: "src={{item.src}} dest={{item.dest}}"
+  with_items:
+    -
+      dest: "{{cepfolder}}/cep/prometheus/alert.rules"
+      src: "auto-scaling/alert.rules"
+    -
+      dest: "{{cepfolder}}/cep/alertmanager/alertmanager.conf"
+      src: "auto-scaling/alertmanager.conf"
+  register: prom_conf_changed
+  when: installAutoScale == True or installAutoScale == "yes"
+  tags:
+   - auto-scaling
+   
 - name: Copy config files for cep-portal
   template: "src={{item.src}} dest={{item.dest}}"
   with_items:
@@ -81,5 +125,5 @@
       src: "cep-portal/endpoint-jsonArr.j2"
   register: cep_conf_changed
   when: installcepui == True or installcepui == "yes"
- 
-
+  tags:
+   - cep_portal

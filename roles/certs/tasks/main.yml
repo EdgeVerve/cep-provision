@@ -74,15 +74,6 @@
     - "{{  groups['manager'] }}"
     - "{{  groups['worker'] }}"
     
-- name: Install CA Certificates
-  yum:
-    name: ca-certificates
-    state: latest
-  environment:
-    http_proxy: "{{http_proxy}}"
-    https_proxy: "{{https_proxy}}" 
-    no_proxy: "{{no_proxy}}"  
-
 - name: copy CA certs bundle into docker deamon trusted certs - cp /etc/pki/tls/certs/ca-bundle.crt /etc/docker/certs.d/{{registryname}}/
   command: cp /etc/pki/tls/certs/ca-bundle.crt /etc/docker/certs.d/{{registryname}}/ 
 
