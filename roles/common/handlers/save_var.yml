@@ -1,0 +1,15 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+
+- set_fact: 
+    "{{default_key}}": "{{registered_value.user_input}}"
+  when: registered_value is defined and registered_value.user_input is defined and registered_value.user_input != ""
+  register: changed_var
+
+- debug:
+    msg: "{{default_value}}"  
+  when: default_value is defined
+  
+- set_fact: 
+    "{{default_key}}": "{{default_value}}"
+  when: (changed_var | skipped) and default_value is defined
