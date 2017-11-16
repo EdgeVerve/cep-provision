@@ -1,7 +1,7 @@
 #Â©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
 
 - pause:
-  prompt: "Set Domain Name to access application/services(DNS should support *.domainname) [{{domainname | default('oecloud.dev')}}]"
+    prompt: "Set Domain Name to access application/services(DNS should support *.domainname) [{{domainname | default('oecloud.dev')}}]"
   register: DomainName
 
 - name: Save variable domainname
@@ -14,7 +14,7 @@
 - debug: msg="Domain Name - {{domainname}}"
 
 - pause:
-  prompt: "Is lvm setup for docker storage required [{{directLVMstorage | default('no')}}]"
+    prompt: "Is lvm setup for docker storage required [{{directLVMstorage | default('no')}}]"
   register: DirectLVMstorage
 
 - name: Save variable DirectLVMstorage
@@ -27,7 +27,7 @@
 - debug: msg="Is lvm setup for docker storage required - {{directLVMstorage}}"
   
 - pause:
-  prompt: "Disk path for docker storage setup (required if lvm setup is yes)[{{docker_storage_devs | default('/dev/sdb')}}]"
+    prompt: "Disk path for docker storage setup (required if lvm setup is yes)[{{docker_storage_devs | default('/dev/sdb')}}]"
   register: Docker_storage_devs
   when: (DirectLVMstorage is defined and (DirectLVMstorage.user_input | bool)) or ( (DirectLVMstorage is not defined or DirectLVMstorage.user_input == "") and directLVMstorage == True)
 
@@ -41,7 +41,7 @@
 - debug: msg="Disk path for docker storage setup  - {{docker_storage_devs}}"
 
 - pause: 
-  prompt: "Do you want setup NFS Server to persist CEP Component data [{{setupNFS | default('no')}}]"
+    prompt: "Do you want setup NFS Server to persist CEP Component data [{{setupNFS | default('no')}}]"
   register: SetupNFS
 
 - name: Save variable SetupNFS
@@ -54,7 +54,7 @@
 - debug: msg="Do you want setup NFS Server  - {{setupNFS}}"
 
 - pause: 
-  prompt: "Specify NFS Server share Folder [{{nfsSharePath | default('/nfsshare')}}]"
+    prompt: "Specify NFS Server share Folder [{{nfsSharePath | default('/nfsshare')}}]"
   register: NFSSharePath
   when: (SetupNFS is defined and (SetupNFS.user_input | bool)) or ( (SetupNFS is not defined or SetupNFS.user_input == "") and setupNFS == True)
 
@@ -68,7 +68,7 @@
 - debug: msg="Specify NFS Server share Folder  - {{nfsSharePath}}"
     
 - pause: 
-  prompt: "Specify an folder for cep config and data files[{{cepfolder | default('/datadisk')}}]"
+    prompt: "Specify an folder for cep config and data files[{{cepfolder | default('/datadisk')}}]"
   register: CEPfolder
 
 - name: Save variable cepfolder
@@ -81,7 +81,7 @@
 - debug: msg="Specify an folder for cep config and data files NFS Server share Folder  - {{cepfolder}}"  
 
 - pause:
-  prompt: "Install CEP Portal - Portainer - yes/no [{{installcepui | default('yes')}}]"
+    prompt: "Install CEP Portal - Portainer - yes/no [{{installcepui | default('yes')}}]"
   register: cepUI
 
 - name: Save variable cepUI
@@ -95,7 +95,7 @@
 
   
 - pause: 
-  prompt: "Install Monitoring Service - Prometheus-Grafana - yes/no [{{installmonitor | default('yes')}}]"
+    prompt: "Install Monitoring Service - Prometheus-Grafana - yes/no [{{installmonitor | default('yes')}}]"
   register: cepmon
 
 - name: Save variable cepUI
@@ -108,7 +108,7 @@
 - debug: msg="Install Monitoring Service - Prometheus-Grafana  - {{installmonitor}}" 
 
 - pause: 
-  prompt: "Install Gitlab Service - yes/no [{{installgitlab | default('no')}}]"
+    prompt: "Install Gitlab Service - yes/no [{{installgitlab | default('no')}}]"
   register: InstallGitlab
 
 - name: Save variable installgitlab
@@ -122,7 +122,7 @@
 
   
 - pause: 
-  prompt: "Install Logging Service - Graylog - yes/no [{{installgraylog | default('no')}}]"
+    prompt: "Install Logging Service - Graylog - yes/no [{{installgraylog | default('no')}}]"
   register: cepGraylog
 
 - name: Save variable cepGraylog
@@ -135,7 +135,7 @@
 - debug: msg="Install Logging Service  - {{installgraylog}}"
   
 - pause: 
-  prompt: "Install Autoscaling Service - yes/no [{{installAutoScale | default('yes')}}]"
+    prompt: "Install Autoscaling Service - yes/no [{{installAutoScale | default('yes')}}]"
   register: cepAutoScale
     
 - name: Save variable cepAutoScale
