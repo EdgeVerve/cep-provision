@@ -7,9 +7,9 @@
 - name: Save variable domainname
   include: roles/common/handlers/save_var.yml
   vars:
-  default_key: "domainname"
-  default_value: "{{domainname| default('oecloud.dev')}}"
-  registered_value: "{{DomainName}}"
+    default_key: "domainname"
+    default_value: "{{domainname| default('oecloud.dev')}}"
+    registered_value: "{{DomainName}}"
 
 - debug: msg="Domain Name - {{domainname}}"
 
@@ -20,9 +20,9 @@
 - name: Save variable DirectLVMstorage
   include: roles/common/handlers/save_var.yml
   vars:
-  default_key: "directLVMstorage"
-  default_value: "{{directLVMstorage| default('no')}}"
-  registered_value: "{{DirectLVMstorage}}"
+    default_key: "directLVMstorage"
+    default_value: "{{directLVMstorage| default('no')}}"
+    registered_value: "{{DirectLVMstorage}}"
 
 - debug: msg="Is lvm setup for docker storage required - {{directLVMstorage}}"
   
@@ -34,9 +34,9 @@
 - name: Save variable DirectLVMstorage
   include: roles/common/handlers/save_var.yml
   vars:
-  default_key: "docker_storage_devs"
-  default_value: "{{docker_storage_devs | default('/dev/sdb')}}"
-  registered_value: "{{Docker_storage_devs}}"
+    default_key: "docker_storage_devs"
+    default_value: "{{docker_storage_devs | default('/dev/sdb')}}"
+    registered_value: "{{Docker_storage_devs}}"
 
 - debug: msg="Disk path for docker storage setup  - {{docker_storage_devs}}"
 
@@ -47,9 +47,9 @@
 - name: Save variable SetupNFS
   include: roles/common/handlers/save_var.yml
   vars:
-  default_key: "setupNFS"
-  default_value: "{{setupNFS | default('no')}}"
-  registered_value: "{{SetupNFS}}"
+    default_key: "setupNFS"
+    default_value: "{{setupNFS | default('no')}}"
+    registered_value: "{{SetupNFS}}"
 
 - debug: msg="Do you want setup NFS Server  - {{setupNFS}}"
 
@@ -61,9 +61,9 @@
 - name: Save variable nfsSharePath
   include: roles/common/handlers/save_var.yml
   vars:
-  default_key: "nfsSharePath"
-  default_value: "{{nfsSharePath| default('/nfsshare')}}"
-  registered_value: "{{NFSSharePath}}"
+    default_key: "nfsSharePath"
+    default_value: "{{nfsSharePath| default('/nfsshare')}}"
+    registered_value: "{{NFSSharePath}}"
 
 - debug: msg="Specify NFS Server share Folder  - {{nfsSharePath}}"
     
@@ -74,9 +74,9 @@
 - name: Save variable cepfolder
   include: roles/common/handlers/save_var.yml
   vars:
-  default_key: "cepfolder"
-  default_value: "{{cepfolder| default('/datadisk')}}"
-  registered_value: "{{CEPfolder}}"
+    default_key: "cepfolder"
+    default_value: "{{cepfolder| default('/datadisk')}}"
+    registered_value: "{{CEPfolder}}"
 
 - debug: msg="Specify an folder for cep config and data files NFS Server share Folder  - {{cepfolder}}"  
 
@@ -87,9 +87,9 @@
 - name: Save variable cepUI
   include: roles/common/handlers/save_var.yml
   vars:
-  default_key: "installcepui"
-  default_value: "{{installcepui| default('yes')}}"
-  registered_value: "{{cepUI}}"
+    default_key: "installcepui"
+    default_value: "{{installcepui| default('yes')}}"
+    registered_value: "{{cepUI}}"
 
 - debug: msg="Install CEP Portal - Portainer  - {{installcepui}}" 
 
@@ -101,9 +101,9 @@
 - name: Save variable cepUI
   include: roles/common/handlers/save_var.yml
   vars:
-  default_key: "installmonitor"
-  default_value: "{{installmonitor| default('yes')}}"
-  registered_value: "{{cepmon}}"
+    default_key: "installmonitor"
+    default_value: "{{installmonitor| default('yes')}}"
+    registered_value: "{{cepmon}}"
 
 - debug: msg="Install Monitoring Service - Prometheus-Grafana  - {{installmonitor}}" 
 
@@ -114,9 +114,9 @@
 - name: Save variable installgitlab
   include: roles/common/handlers/save_var.yml
   vars:
-  default_key: "installgitlab"
-  default_value: "{{installgitlab| default('no')}}"
-  registered_value: "{{InstallGitlab}}"
+    default_key: "installgitlab"
+    default_value: "{{installgitlab| default('no')}}"
+    registered_value: "{{InstallGitlab}}"
 
 - debug: msg="Install Gitlab Service  - {{installgitlab}}" 
 
@@ -128,9 +128,9 @@
 - name: Save variable cepGraylog
   include: roles/common/handlers/save_var.yml
   vars:
-  default_key: "installgraylog"
-  default_value: "{{installgraylog| default('no')}}"
-  registered_value: "{{cepGraylog}}"
+    default_key: "installgraylog"
+    default_value: "{{installgraylog| default('no')}}"
+    registered_value: "{{cepGraylog}}"
 
 - debug: msg="Install Logging Service  - {{installgraylog}}"
   
@@ -141,9 +141,9 @@
 - name: Save variable cepAutoScale
   include: roles/common/handlers/save_var.yml
   vars:
-  default_key: "installAutoScale"
-  default_value: "{{installAutoScale| default('yes')}}"
-  registered_value: "{{cepAutoScale}}"
+    default_key: "installAutoScale"
+    default_value: "{{installAutoScale| default('yes')}}"
+    registered_value: "{{cepAutoScale}}"
 
 - debug: msg="Install Autoscaling Service  - {{installAutoScale}}"
 
