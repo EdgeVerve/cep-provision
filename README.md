@@ -7,6 +7,7 @@ CEP leverages docker swarm cluster which allows us to orchestrate docker contain
 4. Service Health Checks 
 5. Service monitoring
 6. Service Logging
+7. Service Auto-scaling
 
 ## Architecture
 
@@ -29,6 +30,7 @@ This scripts includes the following steps,
 9.  Setup of logging module. ([more](https://github.com/Graylog2/graylog2-server))
 10. Installation of gitlab server. ([more](https://about.gitlab.com/features/))
 11. Setup cronjob to cleanup orphan volumes, images, containers, networks and garbage collect private registry ([more](./docs/Cleanup_cronjob.md))
+12. Setup Auto-scaling environment ([more](https://github.com/EdgeVerve/cep-auto-scaler))
 
 At the end of running this script you have,
 1. Private registry (v2 API) running at https://registry.<domain\>
