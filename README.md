@@ -7,6 +7,8 @@ CEP leverages docker swarm cluster which allows us to orchestrate docker contain
 4. Service Health Checks 
 5. Service monitoring
 6. Service Logging
+7. Service Auto-scaling
+8. Auto garbage clean-up
 
 ## Getting Started 
 Starting guide can be found [here](./docs/GettingStarted.md)
