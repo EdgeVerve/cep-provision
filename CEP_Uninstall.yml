@@ -12,11 +12,12 @@
 
     - name: DomainName
       prompt: "Set Domain Name to access application/services(DNS should support *.domainname)"
-      default: "cepapp.dev"
+      default: "oecloud.dev"
       private: no
       
     - name: cepfolder
-      prompt: "Specify the folder used for cep config files and Docker data (eg: /datadisk)"
+      prompt: "Specify the folder used for cep config files and Docker data"
+      default: "/datadisk"
       private: no
       
     - name: DirectLVMstorage
