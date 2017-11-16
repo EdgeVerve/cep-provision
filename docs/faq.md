@@ -24,7 +24,7 @@ If you choose to use graylog/gitlab, it's better to have 4GB RAM per machine.
 
 > Is it safe to run CEP script again on a working cluster?
 
-CEP script was written in a manner that if no configuration changes for a particular node, no service of that node is turned on / turned off / restarted by CEP. If some settings has been changed on daemon level, CEP will reload and restart docker daemon.
+CEP script was written in a manner that if no configuration changes for a particular node, no service of that node is turned on / turned off / restarted by CEP. If you still want to be cautious you can add '--live-restore' flag to dockerd service command which keeps running containers in daemon downtime. By default it is not enabled.
 
 > How can I distinguish between deployed application and CEP services as both are deployed as a docker service?
 
@@ -60,6 +60,6 @@ Where you need to replace valid.crt , valid.key, valid.ca with the path to your 
 This means browser is able to connect to the server but server is not returning proper response.
 
 1. Check if application is deployed successfully and not giving any error in logs.
-2. Check docker service ps <application name\> of the service to check if deployed service is in running condition.
+2. Check docker service ps <<application name>> of the service to check if deployed service is in running condition.
 3. Check if application docker service has VIRTUAL_HOST and SERVICE_PORTS variable present.
 4. Check if application docker service is part of router_network.

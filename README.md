@@ -7,8 +7,10 @@ CEP leverages docker swarm cluster which allows us to orchestrate docker contain
 4. Service Health Checks 
 5. Service monitoring
 6. Service Logging
-7. Service Auto-scaling
-8. Auto garbage clean-up
+
+## Architecture
+
+![CEP Architecture](./docs/CEP-Architecture.png)
 
 ## Getting Started 
 Starting guide can be found [here](./docs/GettingStarted.md)
@@ -37,6 +39,9 @@ At the end of running this script you have,
 
 If your servers have private IP one can access by giving appropriate host entry. For public access, one can
 put A-record for server ip for *.<domain\> and URL's can be accessed through it. 
+
+## FAQ
+Commonly faced issues and queries are given [here](./docs/faq.md).
 
 ## More information
 Please visit [oeCloud.io](https://www.oecloud.io)

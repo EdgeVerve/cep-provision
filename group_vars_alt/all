@@ -1,0 +1,91 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+#This is intra-organisation properties file. If you are outside Edgeverve/Infosys, you need to replace this with the file located on group_vars_alt folder.
+#-----------------
+#Global variables
+#-----------------
+registryname: "registry.{{domainname}}" #URL of the private registry to be created inside CEP
+ceppubregdomainname: "registry.oecloud.local" #registry being used to pull CEP component images
+ceppubregip: "10.73.96.214" #If host entry is needed to pull CEP component images
+ceppubreguser: "" #If registry login (username) is needed to pull CEP component images
+ceppubregpass: ""  #If registry login (password) is needed to pull CEP component images
+enabledockerhub: yes #Enable proxy in docker daemon
+certgenneeded: yes #If self-signed certificate generation is needed, if no please provide certificates in /roles/certs/templatesSSLCertificates/{{domainname}}/
+use_validcert_only_for_haproxy: yes #If set to yes, certificates provided/generated will be used only for haproxy (ssl termination)
+
+#---------------------------------------------------
+# Bases Images from public registry to setup EVPaaS
+#---------------------------------------------------
+router: "{{ceppubregdomainname}}/docker-swarm-router"
+paasui: "{{ceppubregdomainname}}/portainer"
+registry: "{{ceppubregdomainname}}/registry"
+node_exporter: "{{ceppubregdomainname}}/node-exporter"
+prometheus: "{{ceppubregdomainname}}/prometheus"
+grafana: "{{ceppubregdomainname}}/grafana:4.3.2"
+alertmanager: "{{ceppubregdomainname}}/alertmanager:v0.7.1"
+
+#---------------------------------------------------------------------
+# Base Images required in private registry for Application deployment
+#---------------------------------------------------------------------
+public_alpine_node: "alpine-node"
+public_node_tag: latest
+public_alpine_mongo: "alpine-mongo"
+public_mongo_tag: latest
+alpine_node: "alpine-node"
+node_tag: latest
+alpine_mongo: "alpine-mongo"
+mongo_tag: latest
+#cep_executor: "cep-executor"
+#cep_executor_tag: latest
+
+#-----------------------------
+#Images for optional features
+#-----------------------------
+alpine_gitlab_runner: "{{ceppubregdomainname}}/alpine-gitlab-runner"
+gitlab: "{{ceppubregdomainname}}/gitlab/gitlab-ce"
+graylog: "{{ceppubregdomainname}}/graylog"
+graylogdb: "{{ceppubregdomainname}}/{{public_alpine_mongo}}:{{public_mongo_tag}}"
+graylogelastic: "{{ceppubregdomainname}}/elasticsearch"
+auto_scaler: "{{ceppubregdomainname}}/auto-scaler"
+auto_scaler_mongo: "{{ceppubregdomainname}}/{{public_alpine_mongo}}:{{public_mongo_tag}}"
+graylog_secret: "somepasswordpepper"
+graylog_password_hash: "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
+
+#---------------------------------------------------------------
+#Alternative IP/DNS for certificate generation
+#---------------------------------------------------------------
+subjectAltNameDNS: "*.{{domainname}}"
+
+#---------------------------------------------------------------
+#Docker storage parameters
+#---------------------------------------------------------------
+docker_storage_storage_driver: "devicemapper"
+docker_storage_vg: "vgpool"
+docker_storage_data_size: "40%VG"
+docker_storage_min_data_size: "2G"
+docker_storage_chunk_size: "512K"
+docker_storage_growpart: "false"
+docker_storage_auto_extend_pool: "yes"
+docker_storage_pool_autoextend_threshold: "80"
+docker_storage_pool_autoextend_percent: "20"
+docker_storage_device_wait_timeout: "60"
+docker_storage_wipe_signatures: "true"
+docker_storage_datadisk_size: "40%VG"
+docker_storage_datadisk_name: "datadisk"
+docker_storage_datadisk_path: "{{cepfolder}}/cep/"
+
+#---------------------------------------------------------------
+#Variable Initialization
+#---------------------------------------------------------------
+swarm_manager_operational_list: "['']" #Initiation of variable
+swarm_manager_bootstrap_list: "['']" #Initiation of variable
+swarm_worker_operational_list: "['']" #Initiation of variable
+swarm_worker_bootstrap_list: "['']" #Initiation of variable
+
+#---------------------------------------------------------------
+#Cleanup Cron Parameters
+#---------------------------------------------------------------
+cleanup_cron_enable: no
+cleanup_cron_timing: "0 4 * * *"
+cleanup_cron_user: "root"
+crontab_file: "/etc/crontab"

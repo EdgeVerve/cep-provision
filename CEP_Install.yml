@@ -1,84 +1,219 @@
 #©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
 
+    
 #Get inputs from users to setup CEP
 - hosts: 
-  - all
   - localhost
   
-  vars_prompt:
-  
-    - name: DomainName
-      prompt: "Set Domain Name to access application/services(DNS should support *.domainname)"
-      default: "cepapp.dev"
-      private: no
-    
-    - name: DirectLVMstorage
-      prompt: "Is lvm setup for docker storage required"
-      default: "no"
-      private: no
-      
-    - name: Docker_storage_devs
-      prompt: "Disk path for docker storage setup (required if lvm setup is yes)"
-      default: "/dev/sdb"
-      private: no
-
-    - name: setupNFS
-      prompt: "Do you want setup NFS Server to persist CEP Component data"
-      default: "no"
-      private: no
-    
-    - name: NFSSharePath
-      prompt: "Specify NFS Server share Folder (required if NFS Server setup is yes)"
-      private: no      
-      
-    - name: cepfolder
-      prompt: "Specify an folder for cep config and data files (eg: /datadisk)"
-      private: no            
- 
-    - name: cepUI
-      prompt: "Install CEP Portal - Portainer - yes/no"
-      default: "yes"
-      private: no
-      
-    - name: cepmon
-      prompt: "Install Monitoring Service - Prometheus-Grafana - yes/no"
-      default: "yes"
-      private: no
-
-    - name: InstallGitlab
-      prompt: "Install Gitlab Service - yes/no"
-      default: "no"
-      private: no
-      
-    - name: cepGraylog
-      prompt: "Install Logging Service - Graylog - yes/no"
-      default: "yes"
-      private: no      
-    
+  tags:
+    - variable_setup
+     
   tasks:
-    - set_fact: 
-        domainname: "{{DomainName}}"
-        cepfolder: "{{cepfolder}}"
-        installgitlab: "{{InstallGitlab}}" 
-        installcepui: "{{cepUI}}"
-        directLVMstorage: "{{DirectLVMstorage}}"
-        docker_storage_devs: "{{Docker_storage_devs}}"
-        installgraylog: "{{cepGraylog}}"
-        installmonitor: "{{cepmon}}"
-        setupNFS: "{{setupNFS}}"
-        NFSSharePath: "{{NFSSharePath}}" 
+  
+    - pause:
+        prompt: "Set Domain Name to access application/services(DNS should support *.domainname) [{{domainname | default('oecloud.dev')}}]"
+      register: DomainName
+    
+    - name: Save variable domainname
+      include: roles/common/handlers/save_var.yml
+      vars:
+        default_key: "domainname"
+        default_value: "{{domainname| default('oecloud.dev')}}"
+        registered_value: "{{DomainName}}"
+    
+    - debug: msg="Domain Name - {{domainname}}"
+    
+    - pause:
+        prompt: "Is lvm setup for docker storage required [{{directLVMstorage | default('no')}}]"
+      register: DirectLVMstorage
+
+    - name: Save variable DirectLVMstorage
+      include: roles/common/handlers/save_var.yml
+      vars:
+        default_key: "directLVMstorage"
+        default_value: "{{directLVMstorage| default('no')}}"
+        registered_value: "{{DirectLVMstorage}}"
+    
+    - debug: msg="Is lvm setup for docker storage required - {{directLVMstorage}}"
+      
+    - pause:
+        prompt: "Disk path for docker storage setup (required if lvm setup is yes)[{{docker_storage_devs | default('/dev/sdb')}}]"
+      register: Docker_storage_devs
+      when: (DirectLVMstorage is defined and (DirectLVMstorage.user_input | bool)) or ( (DirectLVMstorage is not defined or DirectLVMstorage.user_input == "") and directLVMstorage == True)
+   
+    - name: Save variable DirectLVMstorage
+      include: roles/common/handlers/save_var.yml
+      vars:
+        default_key: "docker_storage_devs"
+        default_value: "{{docker_storage_devs | default('/dev/sdb')}}"
+        registered_value: "{{Docker_storage_devs}}"
+    
+    - debug: msg="Disk path for docker storage setup  - {{docker_storage_devs}}"
+
+    - pause: 
+        prompt: "Do you want setup NFS Server to persist CEP Component data [{{setupNFS | default('no')}}]"
+      register: SetupNFS
+
+    - name: Save variable SetupNFS
+      include: roles/common/handlers/save_var.yml
+      vars:
+        default_key: "setupNFS"
+        default_value: "{{setupNFS | default('no')}}"
+        registered_value: "{{SetupNFS}}"
+    
+    - debug: msg="Do you want setup NFS Server  - {{setupNFS}}"
+    
+    - pause: 
+        prompt: "Specify NFS Server share Folder [{{nfsSharePath | default('/nfsshare')}}]"
+      register: NFSSharePath
+      when: (SetupNFS is defined and (SetupNFS.user_input | bool)) or ( (SetupNFS is not defined or SetupNFS.user_input == "") and setupNFS == True)
+   
+    - name: Save variable nfsSharePath
+      include: roles/common/handlers/save_var.yml
+      vars:
+        default_key: "nfsSharePath"
+        default_value: "{{nfsSharePath| default('/nfsshare')}}"
+        registered_value: "{{NFSSharePath}}"
+    
+    - debug: msg="Specify NFS Server share Folder  - {{nfsSharePath}}"
+            
+    - pause: 
+        prompt: "Specify an folder for cep config and data files[{{cepfolder | default('/datadisk')}}]"
+      register: CEPfolder
+
+    - name: Save variable cepfolder
+      include: roles/common/handlers/save_var.yml
+      vars:
+        default_key: "cepfolder"
+        default_value: "{{cepfolder| default('/datadisk')}}"
+        registered_value: "{{CEPfolder}}"
+    
+    - debug: msg="Specify an folder for cep config and data files NFS Server share Folder  - {{cepfolder}}"  
+ 
+    - pause:
+        prompt: "Install CEP Portal - Portainer - yes/no [{{installcepui | default('yes')}}]"
+      register: cepUI
+    
+    - name: Save variable cepUI
+      include: roles/common/handlers/save_var.yml
+      vars:
+        default_key: "installcepui"
+        default_value: "{{installcepui| default('yes')}}"
+        registered_value: "{{cepUI}}"
+    
+    - debug: msg="Install CEP Portal - Portainer  - {{installcepui}}" 
+
+      
+    - pause: 
+        prompt: "Install Monitoring Service - Prometheus-Grafana - yes/no [{{installmonitor | default('yes')}}]"
+      register: cepmon
+
+    - name: Save variable cepUI
+      include: roles/common/handlers/save_var.yml
+      vars:
+        default_key: "installmonitor"
+        default_value: "{{installmonitor| default('yes')}}"
+        registered_value: "{{cepmon}}"
+    
+    - debug: msg="Install Monitoring Service - Prometheus-Grafana  - {{installmonitor}}" 
+
+    - pause: 
+        prompt: "Install Gitlab Service - yes/no [{{installgitlab | default('no')}}]"
+      register: InstallGitlab
+    
+    - name: Save variable installgitlab
+      include: roles/common/handlers/save_var.yml
+      vars:
+        default_key: "installgitlab"
+        default_value: "{{installgitlab| default('no')}}"
+        registered_value: "{{InstallGitlab}}"
+    
+    - debug: msg="Install Gitlab Service  - {{installgitlab}}" 
+
+      
+    - pause: 
+        prompt: "Install Logging Service - Graylog - yes/no [{{installgraylog | default('no')}}]"
+      register: cepGraylog
+
+    - name: Save variable cepGraylog
+      include: roles/common/handlers/save_var.yml
+      vars:
+        default_key: "installgraylog"
+        default_value: "{{installgraylog| default('no')}}"
+        registered_value: "{{cepGraylog}}"
+    
+    - debug: msg="Install Logging Service  - {{installgraylog}}"
+      
+    - pause: 
+        prompt: "Install Autoscaling Service - yes/no [{{installAutoScale | default('yes')}}]"
+      register: cepAutoScale
+            
+    - name: Save variable cepAutoScale
+      include: roles/common/handlers/save_var.yml
+      vars:
+        default_key: "installAutoScale"
+        default_value: "{{installAutoScale| default('yes')}}"
+        registered_value: "{{cepAutoScale}}"
+    
+    - debug: msg="Install Autoscaling Service  - {{installAutoScale}}"
+
+    - name: Delete previous config if exists
+      lineinfile: 
+        dest=group_vars/all
+        regexp="{{ item.line }}" 
+        state=absent
+      with_items:
+        - { line: "^domainname:(.*)$" }
+        - { line: "^cepfolder:(.*)$" }
+        - { line: "^installgitlab:(.*)$" }
+        - { line: "^installcepui:(.*)$" }
+        - { line: "^directLVMstorage:(.*)$" }
+        - { line: "^docker_storage_devs:(.*)$" }
+        - { line: "^installgraylog:(.*)$" }
+        - { line: "^installmonitor:(.*)$" }
+        - { line: "^setupNFS:(.*)$" }
+        - { line: "^nfsSharePath:(.*)$" }
+        - { line: "^installAutoScale:(.*)$" }
+
+    - name: "Write current configuration"
+      lineinfile: 
+        dest=group_vars/all
+        line="{{ item.line }}" 
+        state=present
+      with_items:
+        - { line: "domainname: {{domainname}}" }
+        - { line: "cepfolder: {{cepfolder}}" }
+        - { line: "installgitlab: {{installgitlab}}" }
+        - { line: "installcepui: {{installcepui}}" }
+        - { line: "directLVMstorage: {{directLVMstorage}}" }
+        - { line: "docker_storage_devs: {{docker_storage_devs}}" }
+        - { line: "installgraylog: {{installgraylog}}" }
+        - { line: "installmonitor: {{installmonitor}}" }
+        - { line: "setupNFS: {{setupNFS}}" }
+        - { line: "nfsSharePath: {{nfsSharePath}}" }
+        - { line: "installAutoScale: {{installAutoScale}}" }
+
+#Checking for pre-requisites
+- hosts:
+  - AllHosts
+  tags:
+    - pre_check
+  roles:
+    - pre_check
 
 #Generate certificates
 - hosts:
   - localhost
-  
+  tags:
+    - cert_gen
   roles:
     - cert_generation
 
 #Setup NFSServer if provided
 - hosts:
   - NFSServer
-  
+  tags:
+    - nfs_server_setup
   roles:
     - { role: setup_NFS, when: setupNFS == True or setupNFS == "yes"}
         
@@ -87,70 +222,83 @@
   - AllHosts
   
   roles:
-    - docker_storage
-    - certs
-    - install_docker
+    - { role: docker_storage, tags: [ 'docker_storage' ] }
+    - { role: certs, tags: [ 'cert_setup' ] }
+    - { role: install_docker, tags: [ 'install_docker' ] }
     - app_config_setup
-    - { role: setup_cleanup_cron, when: cleanup_cron_enable == True or cleanup_cron_enable == "yes"}
-    - { role: cadvisor, when: installmonitor == True or installmonitor == "yes"}
+    - { role: setup_cleanup_cron, tags: [ 'setup_cleanup_cron' ] , when: cleanup_cron_enable == True or cleanup_cron_enable == "yes"}
+    - { role: cadvisor, tags: [ 'cadvisor','monitoring' ] ,when: installmonitor == True or installmonitor == "yes"}
     
 #Determine swarm status for manager
 - hosts:
   - manager
-  
+  tags:
+    - swarm_setup
+    - router
+    - private_registry
+    - cep_portal
+    - gitlab
+    - graylog
+    - monitoring
+    - auto-scaling
   roles:
     - swarm_master_check
     
 #Determine swarm status for worker
 - hosts:
   - worker
-  
+  tags:
+    - swarm_setup
   roles:
     - swarm_worker_check
 
 - hosts:
   - localhost    
-  
+
   roles:
-    - swarm_master_list
-    - swarm_worker_list
+    - { role: swarm_master_list, tags: ['swarm_setup','router','private_registry','cep_portal','gitlab','graylog','monitoring','auto-scaling'] }
+    - { role: swarm_worker_list, tags: ['swarm_setup'] }
     
 #Initiate swarm if not already present
 - hosts:
   - swarm_manager_bootstrap[0]
-  
+  tags:
+    - swarm_setup
   roles:
     - swarm_master_init
 
 #Retrieve swarm token
 - hosts: 
   - swarm_manager_operational[0]
-
+  tags:
+    - swarm_setup
   roles:
     - swarm_retrieve_token
       
 #Join swarm_masters
 - hosts:
     - swarm_manager_bootstrap:!swarm_manager_operational
-    
+  tags:
+    - swarm_setup  
   roles:
     - swarm_master_join
 
 #Join swarm workers
 - hosts:
     - swarm_worker_bootstrap:!swarm_manager_bootstrap
-
+  tags:
+    - swarm_setup
   roles:
     - swarm_worker_join
 
 #Create services
 - hosts:
     - swarm_manager_operational[0]
-
   roles:
-    - router
-    - private_registry
-    - { role: cep_portal, when: installcepui == True or installcepui == "yes"}
-    - { role: gitlab, when: installgitlab == True or installgitlab == "yes"}
-    - { role: graylog, when: installgraylog == True or installgraylog == "yes"}
-    - { role: monitoring, when: installmonitor == True or installmonitor == "yes"}
+    - { role: router, tags: [ 'router' ]}
+    - { role: private_registry, tags: [ 'private_registry' ]}
+    - { role: cep_portal, tags: [ 'cep_portal' ] , when: installcepui == True or installcepui == "yes"}
+    - { role: gitlab, tags: [ 'gitlab' ] , when: installgitlab == True or installgitlab == "yes"}
+    - { role: graylog, tags: [ 'graylog' ] , when: installgraylog == True or installgraylog == "yes"}
+    - { role: monitoring, tags: [ 'monitoring' ] , when: installmonitor == True or installmonitor == "yes"}
+    - { role: auto-scaling, tags: [ 'auto-scaling' ] , when: installAutoScale == True or installAutoScale == "yes"}
