@@ -1,4 +1,4 @@
-#�2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+#Â©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
 
 - pause:
   prompt: "Set Domain Name to access application/services(DNS should support *.domainname) [{{domainname | default('oecloud.dev')}}]"
