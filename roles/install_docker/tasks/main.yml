@@ -3,3 +3,12 @@
 - name: Install Docker pre-requisites with docker-engine in rhel
   include: install_docker_rhel.yml
   when: ansible_os_family == 'RedHat'
+
+- name : Pull app base images from cep registry - {{ceppubregdomainname}}
+  block:
+   - command: docker pull "{{ceppubregdomainname}}/{{ item.name }}:{{ item.tag }}"
+     with_items:
+       - { name: "{{public_alpine_node}}", tag: "{{public_node_tag}}" }
+  rescue:
+   - fail: msg="Could not connect/pull from {{ceppubregdomainname}}. Please check connectivity/proxy settings"
+ 

@@ -19,7 +19,7 @@
   when: ansible_os_family == 'Debian'
 
 - name: Ensure NFS Share directory exists
-  file: 'path="{{NFSSharePath}}" state=directory'
+  file: 'path="{{nfsSharePath}}" state=directory'
   notify: restart nfs
 
 - name: Copy exports file.

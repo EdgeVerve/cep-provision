@@ -1,3 +1,7 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+# If you are outside Edgeverve/Infosys, you need to use this properties file. If you are inside Edgeverve/Infosys, it's better to use the alternate properties file given due to proxy issues.
+
 #-----------------
 #Global variables
 #-----------------
@@ -14,7 +18,7 @@ use_validcert_only_for_haproxy: yes #If set to yes, certificates provided/genera
 # Bases Images from public registry to setup EVPaaS 
 #---------------------------------------------------
 router: "{{ceppubregdomainname}}/dockercloud/haproxy:1.6.7"
-paasui: "{{ceppubregdomainname}}/portainer/portainer:1.13.3"
+paasui: "{{ceppubregdomainname}}/portainer/portainer:1.15.1"
 registry: "{{ceppubregdomainname}}/registry:2.6.1"
 node_exporter: "{{ceppubregdomainname}}/prom/node-exporter:v0.14.0"
 prometheus: "{{ceppubregdomainname}}/prom/prometheus:v1.7.1"
@@ -84,3 +88,7 @@ cleanup_cron_enable: no
 cleanup_cron_timing: "0 4 * * *"
 cleanup_cron_user: "root"
 crontab_file: "/etc/crontab"
+
+#---------------------------------------------------------------
+#Custom Parameters
+#---------------------------------------------------------------

@@ -1,0 +1,18 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: check if auto-scaler is already present
+  shell: "docker stack ls | grep cep-auto-scaler | wc -l"
+  register: existing_auto_scaler_op
+  ignore_errors: yes
+  
+- name: Create auto-scaler folder for docker compose file
+  file: path={{cepfolder}}/cep/cep-auto-scaler state=directory
+  when: existing_auto_scaler_op.stdout == "0"  
+
+- name: Copy auto-scaler docker compose file
+  template: "src=docker-compose-auto-scaler.j2 dest={{cepfolder}}/cep/cep-auto-scaler/docker-compose.yml"
+  when: existing_auto_scaler_op.stdout == "0"  
+
+- name: spin auto-scaler container
+  shell: docker stack deploy -c {{cepfolder}}/cep/cep-auto-scaler/docker-compose.yml cep-auto-scaler --with-registry-auth      
+  when: existing_auto_scaler_op.stdout == "0"

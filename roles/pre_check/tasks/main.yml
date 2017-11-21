@@ -1,0 +1,96 @@
+#Â©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: Include variables
+  include_vars: group_vars/all
+
+- name: Check Package install
+  block:
+   - yum:
+       name: ca-certificates
+       state: latest
+       update_cache: yes
+     environment:
+       http_proxy: "{{http_proxy}}"
+       https_proxy: "{{https_proxy}}" 
+       no_proxy: "{{no_proxy}}"
+     register: yum-output
+     no_log: true
+   - set_fact: 
+       package_installer_status: "✔ Package manager connectivity is working fine"
+  rescue:
+   - set_fact: 
+       failed: true
+       package_installer_status: "✘ There is connectivity issue which is causing package manager to fail. Check proxy settings if applicable"
+
+- name: Check network access
+  block:
+   - shell: curl -s -o /dev/null -w "%{http_code}" https://registry.hub.docker.com/v1/repositories/hello-world/tags
+     register: response_code
+     environment:
+       http_proxy: "{{http_proxy}}"
+       https_proxy: "{{https_proxy}}" 
+       no_proxy: "{{no_proxy}}"
+   - fail:
+     when: response_code.stdout != "200" and  response_code.stdout != "302"
+     
+   - set_fact: 
+       dockerhub_connectivity_status: "✔ Dockerhub access is working fine!"
+  rescue:
+   - set_fact: 
+       failed: true
+       dockerhub_connectivity_status: "✘ There is connectivity issue which is causing node accesing dockerhub to fail. Check proxy settings if applicable"
+
+- name: Check if node ips are bypassed when proxy is present
+  block:
+   - set_fact:
+       domain_name_regex: ".{{domainname}}"
+   - name: Check if node ip's are present in no_proxy if proxy is present
+     fail:
+     with_items:
+       - "{{  groups['manager'] }}"
+       - "{{  groups['worker'] }}" 
+     when: (http_proxy is defined and http_proxy != "") and (https_proxy is defined and https_proxy != "") and hostvars[item]['inventory_hostname'] not in no_proxy
+     no_log: true 
+   - name: Check if domain are present in no_proxy if proxy is present
+     fail:
+     with_items:
+       - "{{  groups['manager'] }}"
+       - "{{  groups['worker'] }}" 
+     when: (http_proxy is defined and http_proxy != "") and (https_proxy is defined and https_proxy != "") and (domain_name_regex is defined and domain_name_regex not in no_proxy)
+     no_log: true 
+   - set_fact: 
+       proxy_status: "✔ This machine has proper proxy bypass present for ip"
+  rescue:
+   - set_fact:
+       failed: true
+       proxy_status: "✘ Proxy is available but node ip(s) and/or private domain(.{{domainname}}) is not on no_proxy[{{no_proxy}}] "
+
+- name: Check OS
+  block:
+   - fail: 
+     when: ansible_os_family != 'RedHat' or (ansible_distribution_major_version | int )< 7
+     no_log: true
+   - set_fact: 
+       os_status: "✔ This machine has supported OS present"
+  rescue:
+   - set_fact:
+       failed: true
+       os_status: "✘ The only supported platforms for this release RHEL ^7, CentOS ^7 "
+
+- set_fact:
+    check_result: "Passed"
+  when: failed is not defined or failed == false 
+- set_fact:
+    check_result: "Failed"
+  when: failed is defined and failed == true 
+     
+- set_fact:
+    Precheck_status_all: "*** Pre-check Result *** |   Result: {{check_result}} |1. {{ package_installer_status }} |2. {{ dockerhub_connectivity_status }} |3. {{proxy_status}}|4. {{ os_status }}"
+    Precheck_status: Precheck_status_all.split('|') 
+    
+- name: Pre-check status
+  debug: var={{Precheck_status}}
+  
+- name: Fail based on status
+  fail:
+  when: failed is defined and failed == true

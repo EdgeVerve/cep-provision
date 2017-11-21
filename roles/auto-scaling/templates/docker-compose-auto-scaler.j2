@@ -1,0 +1,22 @@
+version: '3'
+services:
+  web:
+    entrypoint: node server.js
+    image: {{ auto_scaler }}
+    networks:
+      - router_network
+      - auto-scaler-network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      placement:
+        constraints:
+          - "node.role == manager"
+  mongo:
+    image: {{ auto_scaler_mongo }}
+    networks:
+      - auto-scaler-network
+networks:
+  auto-scaler-network:
+  router_network:
+    external: true
