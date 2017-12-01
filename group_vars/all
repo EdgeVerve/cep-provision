@@ -47,6 +47,8 @@ gitlab: "{{ceppubregdomainname}}/gitlab/gitlab-ce"
 graylog: "{{ceppubregdomainname}}/graylog/graylog:2.2"
 graylogdb: "{{ceppubregdomainname}}/{{public_alpine_mongo}}:{{public_mongo_tag}}"
 graylogelastic: "{{ceppubregdomainname}}/elasticsearch:2.4-alpine"
+auto_scaler: "{{ceppubregdomainname}}/oecloud/cep-auto-scaler"
+auto_scaler_mongo: "{{ceppubregdomainname}}/{{public_alpine_mongo}}:{{public_mongo_tag}}"
 graylog_secret: "somepasswordpepper"
 graylog_password_hash: "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
 
