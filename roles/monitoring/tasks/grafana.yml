@@ -1,10 +1,15 @@
 #©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
 
-- name: unarchive grafana data files
+- name: Check that the grafana data exists
+  stat:
+    path: "{{cepfolder}}/cep-data/grafana/grafana.db"
+  register: stat_result
+
+- name: copy grafana data files if doesn't exist
   copy: 
     src: "roles/monitoring/templates/grafana/grafana.db"
     dest: "{{cepfolder}}/cep-data/grafana/grafana.db"
-
+  when: stat_result.stat.exists == False 
 
 - name: spin grafana service
   shell: >
