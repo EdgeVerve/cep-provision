@@ -12,6 +12,7 @@ CEP leverages docker swarm cluster which allows us to orchestrate docker contain
 
 ### Docker-EE feature:
 Optional on top of CE features, Bring your own license!
+
 8.  Docker-EE engine setup
 9.  UCP setup
 10. DTR setup
