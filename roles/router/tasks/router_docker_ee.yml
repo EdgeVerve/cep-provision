@@ -1,0 +1,38 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: extra front/back end for ucp
+  set_fact: 
+      front_ucp_dtr_443: >
+                  acl host_rule_ucp hdr(host) -i ucp.{{domainname}}, 
+                  acl host_rule_ucp_port hdr(host) -i ucp.{{domainname}}:443, 
+                  use_backend cep_ucp_controller if host_rule_ucp or host_rule_ucp_port,
+                  acl host_rule_dtr hdr(host) -i dtr.{{domainname}}, 
+                  acl host_rule_dtr_port hdr(host) -i dtr.{{domainname}}:443, 
+                  use_backend cep_dtr_controller if host_rule_dtr or host_rule_dtr_port
+      front_ucp_dtr_80: >
+                  acl host_rule_ucp hdr(host) -i ucp.{{domainname}}, 
+                  acl host_rule_ucp_port hdr(host) -i ucp.{{domainname}}:80, 
+                  use_backend cep_ucp_controller if host_rule_ucp or host_rule_ucp_port,
+                  acl host_rule_dtr hdr(host) -i dtr.{{domainname}}, 
+                  acl host_rule_dtr_port hdr(host) -i dtr.{{domainname}}:80, 
+                  use_backend cep_dtr_controller if host_rule_dtr or host_rule_dtr_port
+      back_ucp: "redirect scheme https code 301 if !{ ssl_fc }, {% set comma = joiner(',') %}{% for host in groups['AllHosts'] %}{{ comma() }}server cep_ucp_{{host}} {{ hostvars[host]['inventory_hostname'] }}:4433 check inter 2000 rise 2 fall 3 ssl verify none{% endfor %}"
+      back_dtr: "redirect scheme https code 301 if !{ ssl_fc }, {% set comma = joiner(',') %}{% for host in groups['AllHosts'] %}{{ comma() }}server cep_dtr_{{host}} {{ hostvars[host]['inventory_hostname'] }}:4500 check inter 2000 rise 2 fall 3 ssl verify none{% endfor %}"
+
+- name: spin router container
+  shell: >
+          docker service create  --detach=false --with-registry-auth 
+          --name cep_router  
+          --network router_network 
+          --mount target=/var/run/docker.sock,source=/var/run/docker.sock,type=bind 
+          -p 80:80 
+          -p 443:443  
+          --constraint "node.role == manager" 
+          -e DEFAULT_SSL_CERT="{{cert_content}}"
+          -e EXTRA_FRONTEND_SETTINGS_443="{{front_ucp_dtr_443}}"
+          -e EXTRA_FRONTEND_SETTINGS_80="{{front_ucp_dtr_80}}"
+          -e ADDITIONAL_BACKEND_cep_ucp_controller="{{back_ucp}}"
+          -e ADDITIONAL_BACKEND_cep_dtr_controller="{{back_dtr}}"
+          -e FORCE_DEFAULT_BACKEND="false"
+          {{ router }}
+  when: existing_router_op.stdout == "0"

@@ -1,6 +1,5 @@
 #©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
 
-    
 #Get inputs from users to setup CEP
 - hosts: 
   - localhost
@@ -66,6 +65,8 @@
     - graylog
     - monitoring
     - auto-scaling
+    - ucp_setup
+    - dtr_setup
   roles:
     - swarm_master_check
     
@@ -81,16 +82,17 @@
   - localhost    
 
   roles:
-    - { role: swarm_master_list, tags: ['swarm_setup','router','private_registry','cep_portal','gitlab','graylog','monitoring','auto-scaling'] }
+    - { role: swarm_master_list, tags: ['swarm_setup','router','private_registry','cep_portal','gitlab','graylog','monitoring','auto-scaling','ucp_setup','dtr_setup'] }
     - { role: swarm_worker_list, tags: ['swarm_setup'] }
-    
+
 #Initiate swarm if not already present
 - hosts:
   - swarm_manager_bootstrap[0]
   tags:
     - swarm_setup
   roles:
-    - swarm_master_init
+    - { role: swarm_master_init, tags: [ 'swarm_setup' ] , when: "(docker_ee_subscription == '' and swarm_manager_operational_list.0 == '[' )" }
+    - { role: ucp_setup, tags: [ 'ucp_setup' ] ,  when: "(docker_ee_subscription != '' and swarm_manager_operational_list.0 == '[' )" }
 
 #Retrieve swarm token
 - hosts: 
@@ -120,8 +122,22 @@
 - hosts:
     - swarm_manager_operational[0]
   roles:
+    #- { role: ucp_setup, tags: [ 'ucp_setup' ] , when: docker_ee_subscription != ""}
     - { role: router, tags: [ 'router' ]}
-    - { role: private_registry, tags: [ 'private_registry' ]}
+    - { role: dtr_setup, tags: [ 'dtr_setup' ] , when: docker_ee_subscription != ""}
+
+#Create DTR replica
+- hosts:
+    - AllHosts:!swarm_manager_operational[0] 
+  serial: 1  
+  roles:
+    - { role: dtr_replica_setup, tags: [ 'dtr_setup' ] , when: docker_ee_subscription != ""}   
+
+#Create services
+- hosts:
+    - swarm_manager_operational[0]
+  roles:
+    - { role: private_registry, tags: [ 'private_registry' ] }
     - { role: cep_portal, tags: [ 'cep_portal' ] , when: installcepui == True or installcepui == "yes"}
     - { role: gitlab, tags: [ 'gitlab' ] , when: installgitlab == True or installgitlab == "yes"}
     - { role: graylog, tags: [ 'graylog' ] , when: installgraylog == True or installgraylog == "yes"}

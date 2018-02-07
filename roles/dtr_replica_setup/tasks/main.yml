@@ -1,0 +1,53 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: check if dtr is already running
+  shell: docker ps | grep dtr-nginx | wc -l
+  register: existing_dtr_op
+
+- name: Get ucp ca
+  get_url:
+    url: "https://{{hostvars[groups['swarm_manager_operational'][0]]['inventory_hostname']}}:4433/ca"
+    dest: "{{cepfolder}}/cep/certificates/ucp-ca.pem"
+    validate_certs: false
+  when: existing_dtr_op.stdout == "0"
+
+- name: store ucp ca on variable
+  shell: "cat {{cepfolder}}/cep/certificates/ucp-ca.pem"
+  register: ucp_ca_op
+
+- name: Register Server Host Name
+  shell: echo $HOSTNAME
+  register: server_hostname
+  
+  
+- set_fact:
+    cert_file_path_ca: "SSLCertificates/{{domainname}}/ca.pem"
+    cert_file_path_cert: "SSLCertificates/{{domainname}}/cert.pem"
+    cert_file_path_key: "SSLCertificates/{{domainname}}/key.pem"
+  when: existing_dtr_op.stdout == "0"
+  
+- set_fact:
+    cert_content_ca: "{{ lookup('file', cert_file_path_ca) }}"
+    cert_content_cert: "{{ lookup('file', cert_file_path_cert) }}"
+    cert_content_key: "{{ lookup('file', cert_file_path_key) }}"
+  when: existing_dtr_op.stdout == "0"
+
+
+- name: install dtr-replica
+  shell: > 
+          docker run --rm 
+          {{ dtr }} 
+          join 
+          --ucp-ca "{{hostvars[groups['swarm_manager_operational'][0]]['ucp_ca_op']['stdout']}}" 
+          --ucp-username  "{{ucp_username}}" 
+          --ucp-password "{{ucp_password}}" 
+          --ucp-url "https://{{hostvars[groups['swarm_manager_operational'][0]]['inventory_hostname']}}:4433" 
+          --ucp-node {{server_hostname.stdout}}
+          --replica-https-port 4500 
+          --replica-http-port 4501
+          --existing-replica-id {{hostvars[groups['swarm_manager_operational'][0]]['dtr_node_id']['stdout']}}
+  when: existing_dtr_op.stdout == "0"
+  retries: 2  
+  delay: 5
+  register: result
+  until: result.rc == 0

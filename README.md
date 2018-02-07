@@ -1,20 +1,32 @@
 # CEP (Cloud Enablement Platform)
 CEP leverages docker swarm cluster which allows us to orchestrate docker container workloads. The CEP includes features like
 
+### Docker-CE feature:
 1. Dynamic URL Generation for services deployed in swarm 
 2. Set of base docker images which applications can choose to use 
 3. Docker Private Registry 
 4. Service Health Checks 
 5. Service monitoring
 6. Service Logging
-7. Service Auto-scaling [Experimental]
+7. Service Auto-scaling
 
+### Docker-EE feature:
+Optional on top of CE features, Bring your own license!
+8.  Docker-EE engine setup
+9.  UCP setup
+10. DTR setup
+11. DTR Replica setup
+12. Backup/Restore of UCP/DTR
+ 
 ## Architecture
 
 ![CEP Architecture](./docs/CEP-Architecture.png)
 
 ## Getting Started 
 Starting guide can be found [here](./docs/GettingStarted.md)
+
+## Guides
+All guides can be found [here](https://www.oecloud.io/guides)
 
 ## Steps covered
 This scripts includes the following steps,

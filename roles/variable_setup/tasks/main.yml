@@ -135,14 +135,14 @@
 - debug: msg="Install Logging Service  - {{installgraylog}}"
   
 - pause: 
-    prompt: "Install Autoscaling Service - yes/no [{{installAutoScale | default('no')}}]"
+    prompt: "Install Autoscaling Service - yes/no [{{installAutoScale | default('yes')}}]"
   register: cepAutoScale
     
 - name: Save variable cepAutoScale
   include: roles/common/handlers/save_var.yml
   vars:
     default_key: "installAutoScale"
-    default_value: "{{installAutoScale| default('no')}}"
+    default_value: "{{installAutoScale| default('yes')}}"
     registered_value: "{{cepAutoScale}}"
 
 - debug: msg="Install Autoscaling Service  - {{installAutoScale}}"

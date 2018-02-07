@@ -1,23 +1,10 @@
 #©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
 
-- name: Add docker repo
-  yum_repository:
-    name: docker
-    description: Docker Repository
-    baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
-    gpgcheck: yes
-    gpgkey: https://download.docker.com/linux/centos/gpg
-    enabled: yes
-  environment:
-    http_proxy: "{{http_proxy}}"
-    https_proxy: "{{https_proxy}}" 
-    no_proxy: "{{no_proxy}}"
-  
 - name: Add epel repo
   yum_repository:
     name: epel
     description: epel release Repository
-    baseurl: http://download.fedoraproject.org/pub/epel/7/$basearch
+    mirrorlist: https://mirrors.fedoraproject.org/mirrorlist?repo=epel-7&arch=$basearch
     gpgcheck: yes
     gpgkey: http://download.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
     enabled: yes
@@ -35,12 +22,15 @@
   with_items:
     #- { name: 'epel-release' }
     - { name: 'firewalld'}
-    - { name: 'python-pip' }      
+    - { name: 'python-pip' }  
+    - { name: 'yum-utils' }
+    - { name: 'device-mapper-persistent-data' }
+    - { name: 'lvm2' }      
   environment:
     http_proxy: "{{http_proxy}}"
     https_proxy: "{{https_proxy}}"
     no_proxy: "{{no_proxy}}"
-
+    
 - name: Install docker Pre-Requisite 
   pip:
     name: "{{item.name}}"
@@ -54,52 +44,24 @@
     http_proxy: "{{http_proxy}}"
     https_proxy: "{{https_proxy}}" 
     no_proxy: "{{no_proxy}}"
-  
-- name: "Install docker-ce"
-  yum: 
-    name: docker-ce
-    state: present
-  environment:
-    http_proxy: "{{http_proxy}}"
-    https_proxy: "{{https_proxy}}" 
-    no_proxy: "{{no_proxy}}"
-
-- name: create {{cepfolder}}/cep/docker folder
-  file: path={{cepfolder}}/cep/docker state=directory 
-
-- name: "Copy daemon json to machine for lvm"
-  template: src='rhel_daemon_lvm.json' dest='{{cepfolder}}/cep/docker/daemon.json'
-  when: directLVMstorage == True or directLVMstorage == "yes"
-  
-- name: "Copy daemon json to machine without lvm"
-  template: src='rhel_daemon.json' dest='{{cepfolder}}/cep/docker/daemon.json'
-  when: directLVMstorage == False or directLVMstorage == "no"
+    
+- name: Add docker0 interface as trusted zone in firewalld
+  firewalld: zone=trusted interface=docker0 permanent=true state=enabled
   
 - name: Ensure firewalld is running.
   service: name=firewalld state=started enabled=yes
 
-- name: Enable docker ports in firewalld
-  firewalld: port={{item.port}} permanent=true state=enabled
-  with_items:
-    - { port: 80/tcp }
-    - { port: 443/tcp }
-    - { port: 2375/tcp }
-    - { port: 4000/tcp }
-    - { port: 7946/tcp }
-    - { port: 7946/udp }
-    - { port: 4789/tcp }
-    - { port: 4789/udp }
-    - { port: 12201/udp } #graylog udp port
-    - { port: 9323/tcp } #docker metrics port
-    - { port: 8080/tcp } #cadvisor port
-  register: firewalld_op
-    
-- name: Add docker0 interface as trusted zone in firewalld
-  firewalld: zone=trusted interface=docker0 permanent=true state=enabled
+- name: Install Docker Enterprise Edition
+  include: install_docker_rhel_ee.yml
+  when: docker_ee_subscription != ""
+
+- name: Install Install Docker Community Edition
+  include: install_docker_rhel_ce.yml
+  when: docker_ee_subscription == ""
 
 - name: restart firewalld
   command: firewall-cmd --reload
-  when: firewalld_op | changed
+  when: (firewalld_op_ce | changed) or (firewalld_op_ee | changed)
   
 - name: waiting for ssh port to get active
   local_action: wait_for port=22 host="{{ inventory_hostname }}" search_regex=OpenSSH delay=5 timeout=60
@@ -113,6 +75,14 @@
 - name: update docker Configuration - docker.conf
   template: src='docker.conf' dest='/etc/systemd/system/docker.service.d/docker.conf'
   register: docker_conf_op
+
+- name: "Copy daemon json to machine for lvm"
+  template: src='rhel_daemon_lvm.json' dest='{{cepfolder}}/cep/docker/daemon.json'
+  when: directLVMstorage == True or directLVMstorage == "yes"
+  
+- name: "Copy daemon json to machine without lvm"
+  template: src='rhel_daemon.json' dest='{{cepfolder}}/cep/docker/daemon.json'
+  when: directLVMstorage == False or directLVMstorage == "no"
 
 - name: Enable proxy to access images from docker public repo
   template: src='http-proxy.conf' dest='/etc/systemd/system/docker.service.d/http-proxy.conf'

@@ -1,0 +1,133 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: Create cep-portal folder for configuration
+  file: path={{cepfolder}}/cep-data/dtr_data state=directory
+
+- name: check if dtr is already running
+  shell: docker ps | grep dtr-nginx | wc -l
+  register: existing_dtr_op
+
+- name: Get ucp ca
+  get_url:
+    url: "https://{{inventory_hostname}}:4433/ca"
+    dest: "{{cepfolder}}/cep/certificates/ucp-ca.pem"
+    validate_certs: false
+  when: existing_dtr_op.stdout == "0"
+
+- name: store ucp ca on variable
+  shell: "cat {{cepfolder}}/cep/certificates/ucp-ca.pem"
+  register: ucp_ca_op
+
+- name: Register Server Host Name
+  shell: echo $HOSTNAME
+  register: server_hostname
+  when: existing_dtr_op.stdout == "0"  
+  
+- set_fact:
+    cert_file_path_ca: "SSLCertificates/{{domainname}}/ca.pem"
+    cert_file_path_cert: "SSLCertificates/{{domainname}}/cert.pem"
+    cert_file_path_key: "SSLCertificates/{{domainname}}/key.pem"
+  when: existing_dtr_op.stdout == "0"
+  
+- set_fact:
+    cert_content_ca: "{{ lookup('file', cert_file_path_ca) }}"
+    cert_content_cert: "{{ lookup('file', cert_file_path_cert) }}"
+    cert_content_key: "{{ lookup('file', cert_file_path_key) }}"
+  when: existing_dtr_op.stdout == "0"
+
+- name: Check if backup file exists
+  stat:
+    path: "{{cepfolder}}/cep-data/dtr-backup-metadata.tar"
+  register: backup_dtr_result
+  when: existing_dtr_op.stdout == "0"
+
+- name: read backup dtr replica id
+  shell: cat {{cepfolder}}/cep-data/dtr-backup-replica-id.txt
+  register: dtr_replica_id
+  when: existing_dtr_op.stdout == "0" and backup_dtr_result.stat.exists == True
+  
+- name: Restore dtr if backup is present
+  shell: >
+          docker run --rm -i
+          --env UCP_PASSWORD={{ucp_password}}
+          {{ dtr }} restore 
+          --http-proxy "{{http_proxy}}" 
+          --https-proxy "{{https_proxy}}" 
+          --no-proxy "{{no_proxy}}" 
+          --ucp-url {{inventory_hostname}}:4433
+          --ucp-insecure-tls
+          --ucp-username {{ucp_username}}
+          --ucp-node {{server_hostname.stdout}}
+          --replica-id {{dtr_replica_id.stdout}} 
+          --replica-https-port 4500 
+          --replica-http-port 4501 < {{cepfolder}}/cep-data/dtr-backup-metadata.tar
+  when: existing_dtr_op.stdout == "0" and backup_dtr_result.stat.exists == True
+
+- name: install dtr without nfs
+  shell: > 
+          docker run --rm 
+          {{ dtr }} 
+          install 
+          --dtr-ca "{{cert_content_ca}}" 
+          --dtr-cert "{{cert_content_cert}}" 
+          --dtr-key "{{cert_content_key}}" 
+          --dtr-storage-volume /datadisk/cep-data/dtr_data
+          --http-proxy "{{http_proxy}}" 
+          --https-proxy "{{https_proxy}}" 
+          --no-proxy "{{no_proxy}}" 
+          --ucp-ca "{{ucp_ca_op.stdout}}" 
+          --ucp-username  "{{ucp_username}}" 
+          --ucp-password "{{ucp_password}}" 
+          --ucp-url "https://{{inventory_hostname}}:4433" 
+          --ucp-node {{server_hostname.stdout}}
+          --replica-https-port 4500 
+          --replica-http-port 4501
+  when: existing_dtr_op.stdout == "0" and backup_dtr_result.stat.exists == False and (setupNFS == False or setupNFS == "no")
+
+- name: install dtr with nfs
+  shell: > 
+          docker run --rm 
+          {{ dtr }} 
+          install 
+          --dtr-ca "{{cert_content_ca}}" 
+          --dtr-cert "{{cert_content_cert}}" 
+          --dtr-key "{{cert_content_key}}" 
+          --nfs-storage-url "nfs://{{  hostvars[groups['NFSServer'][0]]['inventory_hostname'] }}{{nfsSharePath}}/dtr_data/" 
+          --http-proxy "{{http_proxy}}" 
+          --https-proxy "{{https_proxy}}" 
+          --no-proxy "{{no_proxy}}" 
+          --ucp-ca "{{ucp_ca_op.stdout}}" 
+          --ucp-username  "{{ucp_username}}" 
+          --ucp-password "{{ucp_password}}" 
+          --ucp-url "https://{{inventory_hostname}}:4433" 
+          --ucp-node {{server_hostname.stdout}}
+          --replica-https-port 4500 
+          --replica-http-port 4501
+  when: existing_dtr_op.stdout == "0" and backup_dtr_result.stat.exists == False and (setupNFS == True or setupNFS == "yes")
+  
+  
+- name: Check for dtr node ID
+  shell: "docker ps --format '{{\"{{\"}}.Names{{\"}}\"}}' | grep dtr-nginx | cut -c 11-"
+  register: dtr_node_id
+  
+- name: Make folder for backup shell script
+  file: path="{{cepfolder}}/cep/dtr-backup-script" state=directory
+
+- name: Copy required files
+  template: src={{item.src}} dest={{item.dest}} mode=u+x
+  with_items:
+    -
+      dest: "{{cepfolder}}/cep/dtr-backup-script/dtr-backup.sh"
+      src: "dtr-backup-script/dtr-backup.sh"
+
+- name: Adding crontab entry for cleanup
+  lineinfile:
+    line: "{{dtr_cron_timing}} {{dtr_cron_user}} {{cepfolder}}/cep/dtr-backup-script/dtr-backup.sh"
+    path: "{{crontab_file}}"
+    state: present
+
+- name: dtr entry in /etc/hosts of each node - {{  inventory_hostname }} dtr.{{domainname}}
+  lineinfile: dest=/etc/hosts line="{{ inventory_hostname }} dtr.{{domainname}}" state=present
+  delegate_to: "{{item}}"
+  delegate_facts: True
+  with_items: "{{groups['AllHosts']}}"

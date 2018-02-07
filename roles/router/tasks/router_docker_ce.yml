@@ -1,0 +1,14 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: spin router container
+  shell: >
+          docker service create  --detach=false --with-registry-auth 
+          --name cep_router 
+          --network router_network 
+          --mount target=/var/run/docker.sock,source=/var/run/docker.sock,type=bind 
+          -p 80:80 
+          -p 443:443  
+          --constraint "node.role == manager" 
+          -e DEFAULT_SSL_CERT="{{cert_content}}"
+          {{ router }}
+  when: existing_router_op.stdout == "0"

@@ -23,7 +23,12 @@
    - monitoring
    - nfs_server_setup
    
-    
+- name: Register Server Host Name
+  shell: echo $HOSTNAME
+  register: server_hostname
+  tags:
+   - cep_portal
+      
 #mount -t nfs {{nfsserver_ip}}:{{nfsshare}}/evfpaasshare /etc/evfpaasshare
 - name: mount NFS share folder
   mount:
@@ -45,6 +50,22 @@
   file: path={{cepfolder}}/cep-data/cep-portal state=directory
   tags:
    - cep_portal
+   
+- name: Create backup folder for graylog_server
+  file: path={{cepfolder}}/cep-data/graylog/data state=directory
+  tags:
+   - graylog
+
+#/data/db
+- name: Create backup folder for graylog_mongo
+  file: path={{cepfolder}}/cep-data/graylog/mongo/data state=directory
+  tags:
+   - graylog
+ #/usr/share/elasticsearch/data  
+- name: Create backup folder for graylog_elasticsearch
+  file: path={{cepfolder}}/cep-data/graylog/elasticsearch/data state=directory
+  tags:
+   - graylog
 
 - name: Create backup folder for prometheus
   file: path={{cepfolder}}/cep-data/prometheus state=directory
