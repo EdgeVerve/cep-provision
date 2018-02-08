@@ -12,9 +12,11 @@ ceppubregpass: ""  #If registry login (password) is needed to pull CEP component
 enabledockerhub: yes #Enable proxy in docker daemon
 certgenneeded: yes #If self-signed certificate generation is needed, if no please provide certificates in /roles/certs/templatesSSLCertificates/{{domainname}}/
 use_validcert_only_for_haproxy: yes #If set to yes, certificates provided/generated will be used only for haproxy (ssl termination)
-
+docker_ee_subscription: ""
+ucp_username: "oecloudadmin"
+ucp_password: "oecloudPassword"
 #---------------------------------------------------
-# Bases Images from public registry to setup EVPaaS
+# Bases Images from public registry to setup CEP
 #---------------------------------------------------
 router: "{{ceppubregdomainname}}/docker-swarm-router"
 paasui: "{{ceppubregdomainname}}/portainer"
@@ -23,6 +25,8 @@ node_exporter: "{{ceppubregdomainname}}/node-exporter"
 prometheus: "{{ceppubregdomainname}}/prometheus"
 grafana: "{{ceppubregdomainname}}/grafana:4.3.2"
 alertmanager: "{{ceppubregdomainname}}/alertmanager:v0.7.1"
+ucp: "{{ceppubregdomainname}}/docker/ucp"
+dtr: "{{ceppubregdomainname}}/docker/dtr"
 
 #---------------------------------------------------------------------
 # Base Images required in private registry for Application deployment
@@ -83,9 +87,18 @@ swarm_worker_operational_list: "['']" #Initiation of variable
 swarm_worker_bootstrap_list: "['']" #Initiation of variable
 
 #---------------------------------------------------------------
-#Cleanup Cron Parameters
+#Cron Parameters
 #---------------------------------------------------------------
 cleanup_cron_enable: no
 cleanup_cron_timing: "0 4 * * *"
-cleanup_cron_user: "root"
+ucp_cron_timing: "0 5 * * *"
+dtr_cron_timing: "0 3 * * *"
+cron_user: "root"
+cleanup_cron_user: "{{cron_user}}"
+ucp_cron_user: "{{cron_user}}"
+dtr_cron_user: "{{cron_user}}"
 crontab_file: "/etc/crontab"
+
+#---------------------------------------------------------------
+#Custom Parameters
+#---------------------------------------------------------------
