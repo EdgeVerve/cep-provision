@@ -30,7 +30,7 @@
     https_proxy: "{{https_proxy}}" 
     no_proxy: "{{no_proxy}}"
   when:
-    ansible_distribution == 'Red Hat Enterprise Linux'
+    ansible_distribution == 'RedHat'
   
 - name: "Install docker-ee for CentOS"
   yum: 

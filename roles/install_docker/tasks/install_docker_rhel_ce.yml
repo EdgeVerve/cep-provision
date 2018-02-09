@@ -48,7 +48,7 @@
     https_proxy: "{{https_proxy}}" 
     no_proxy: "{{no_proxy}}"
   when:
-    ansible_distribution == 'Red Hat Enterprise Linux'
+    ansible_distribution == 'RedHat'
     
 - name: Enable docker ports in firewalld
   firewalld: port={{item.port}} permanent=true state=enabled
