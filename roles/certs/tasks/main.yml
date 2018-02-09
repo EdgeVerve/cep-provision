@@ -47,10 +47,19 @@
 #Copy SSL Certificates into all machines
 - name: Creates directory for SSL certificates
   file: path=/etc/docker/certs.d/{{registryname}} state=directory
+  
+- name: Creates directory for SSL certificates
+  file: path=/etc/docker/certs.d/dtr.{{domainname}} state=directory
+  when: docker_ee_subscription != ""
+ 
 
 - name: copy domain.crt as ca.crt into /etc/docker/certs.d/{{registryname}} of each swarm node
   template: src='SSLCertificates/{{domainname}}/ca.pem' dest=/etc/docker/certs.d/{{registryname}}/{{domainname}}.ca.crt
   when: (certgenneeded == "yes" or certgenneeded == True)
+
+- name: copy domain.crt as ca.crt into /etc/docker/certs.d/dtr.{{domainname}} of each swarm node
+  template: src='SSLCertificates/{{domainname}}/ca.pem' dest=/etc/docker/certs.d/dtr.{{domainname}}/{{domainname}}.ca.crt
+  when: (certgenneeded == "yes" or certgenneeded == True) and (docker_ee_subscription != "")
 
 - name: copy domain.crt as ca.crt into /etc/docker/certs.d/{{registryname}} of each swarm node
   template: src='SSLCertificates/ca.pem' dest=/etc/docker/certs.d/{{registryname}}/{{domainname}}.ca.crt
@@ -71,8 +80,7 @@
 - name: Make hosts file entry of swarm manager for each boxes
   lineinfile: dest=/etc/hosts line="{{hostvars[item]['inventory_hostname']}}  machine-{{hostvars[item]['inventory_hostname'] |  regex_replace('\\.', '-') }}.{{domainname}}"
   with_items:
-    - "{{  groups['manager'] }}"
-    - "{{  groups['worker'] }}"
+    - "{{  groups['AllHosts'] }}"
     
 - name: copy CA certs bundle into docker deamon trusted certs - cp /etc/pki/tls/certs/ca-bundle.crt /etc/docker/certs.d/{{registryname}}/
   command: cp /etc/pki/tls/certs/ca-bundle.crt /etc/docker/certs.d/{{registryname}}/ 

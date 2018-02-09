@@ -1,6 +1,7 @@
 # CEP (Cloud Enablement Platform)
-CEP leverages docker swarm cluster which allows us to orchestrate docker container workloads. The CEP includes features like
+CEP leverages docker swarm cluster which allows us to orchestrate docker container workloads. This scripts automates CEP cluster formation along with addition/deletion of nodes in cluster. The CEP includes features like
 
+### Docker-CE feature:
 1. Dynamic URL Generation for services deployed in swarm 
 2. Set of base docker images which applications can choose to use 
 3. Docker Private Registry 
@@ -9,12 +10,24 @@ CEP leverages docker swarm cluster which allows us to orchestrate docker contain
 6. Service Logging
 7. Service Auto-scaling [Experimental]
 
+### Docker-EE feature:
+Optional on top of CE features, Bring your own license!
+
+8.  Docker-EE engine setup
+9.  UCP setup
+10. DTR setup
+11. DTR Replica setup
+12. Backup/Restore of UCP/DTR
+ 
 ## Architecture
 
 ![CEP Architecture](./docs/CEP-Architecture.png)
 
 ## Getting Started 
 Starting guide can be found [here](./docs/GettingStarted.md)
+
+## Guides
+All guides can be found [here](https://www.oecloud.io/guides)
 
 ## Steps covered
 This scripts includes the following steps,
@@ -38,6 +51,8 @@ At the end of running this script you have,
 3. Monitoring graphs running at https://cep-monitoring.<domain\>
 4. Logging service running on https://graylog.<domain\> [Optional]
 5. Code repository Gitlab running on https://gitlab.<domain\> [Optional]
+6. UCP running on https://ucp.<domain\> [Optional/EE feature]
+7. DTR running on https://dtr.<domain\> [Optional/EE feature]
 
 If your servers have private IP one can access by giving appropriate host entry. For public access, one can
 put A-record for server ip for *.<domain\> and URL's can be accessed through it. 

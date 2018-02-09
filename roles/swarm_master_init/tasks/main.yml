@@ -1,7 +1,7 @@
 #©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
 
 - name: initialize swarm cluster
-  shell: docker swarm init --advertise-addr={{ ansible_ssh_host }}:4000 --listen-addr=0.0.0.0:4000
+  shell: docker swarm init --advertise-addr={{ ansible_ssh_host }}:2377 --listen-addr=0.0.0.0:2377
   when: "'swarm_manager_operational' not in groups"
   register: bootstrap_first_node
 

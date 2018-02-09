@@ -20,8 +20,17 @@
   shell: "docker volume rm $(docker volume ls -q)"
   ignore_errors: yes
 
+- name: stop docker daemon
+  shell: "systemctl stop docker"
+  ignore_errors: yes
+
+- name: get docker daemon pid
+  shell: "pgrep -f dockerd"
+  register: docker_pid
+  ignore_errors: yes
+
 - name: Kill docker daemon
-  shell: "kill -9 $(pgrep -f dockerd)"
+  shell: "kill -9 {{ docker_pid.stdout }}"
   ignore_errors: yes
 
 
@@ -86,14 +95,24 @@
   when: directLVMstorage == True or directLVMstorage == "yes"
   ignore_errors: yes
   
+  
 - name: remove volume group
   command: vgremove {{docker_storage_vg}}
   when: directLVMstorage == True or directLVMstorage == "yes"
   ignore_errors: yes
 
+- name: mounting datadisk 
+  mount:
+    path: "{{cepfolder}}/cep" 
+    src: "/dev/{{docker_storage_vg}}/{{docker_storage_datadisk_name}}" 
+    fstype: ext4
+    opts: nofail,auto,noatime,rw,user,exec
+    state: absent
+  when: directLVMstorage == True or directLVMstorage == "yes"
+
 - name: Removing mounting volume at startup (fstab entry)
   lineinfile: 
-    line: "/dev/{{docker_storage_vg}}/{{docker_storage_datadisk_name}} {{cepfolder}}/cep ext4  nofail,auto,noatime,rw,user    0   0"
+    line: "/dev/{{docker_storage_vg}}/{{docker_storage_datadisk_name}} {{cepfolder}}/cep ext4  nofail,auto,noatime,rw,user,exec    0   0"
     path: /etc/fstab
     state: absent
   ignore_errors: yes
@@ -115,7 +134,7 @@
     - { port: 80/tcp }
     - { port: 443/tcp }
     - { port: 2375/tcp }
-    - { port: 4000/tcp }
+    - { port: 2377/tcp }
     - { port: 7946/tcp }
     - { port: 7946/udp }
     - { port: 4789/tcp }
@@ -123,6 +142,25 @@
     - { port: 9323/tcp }
     - { port: 8080/tcp }
     - { port: 12201/udp }
+
+- name: Disable ports & SSL port in firewalld
+  firewalld: port={{item.port}} permanent=true state=disabled
+  with_items:
+    - { port: 4500/tcp } #dtr https port
+    - { port: 4501/tcp } #dtr http port
+    - { port: 4433/tcp } #ucp port #1
+    - { port: 12379/tcp } #ucp port #2
+    - { port: 12383/tcp } #ucp port #3
+    - { port: 12382/tcp } #ucp port #4
+    - { port: 12376/tcp } #ucp port #5
+    - { port: 12381/tcp } #ucp port #6
+    - { port: 12387/tcp } #ucp port #7
+    - { port: 12380/tcp } #ucp port #8
+    - { port: 12384/tcp } #ucp port #9
+    - { port: 12386/tcp } #ucp port #10
+    - { port: 12385/tcp } #ucp port #11
+  when: docker_ee_subscription != ""
+ 
     
 - name: Remove docker0 interface as trusted zone in firewalld
   firewalld: zone=trusted interface=docker0 permanent=true state=disabled

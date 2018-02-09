@@ -1,0 +1,67 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: Add docker repo
+  yum_repository:
+    name: docker
+    description: Docker Repository
+    baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
+    gpgcheck: yes
+    gpgkey: https://download.docker.com/linux/centos/gpg
+    enabled: yes
+  environment:
+    http_proxy: "{{http_proxy}}"
+    https_proxy: "{{https_proxy}}" 
+    no_proxy: "{{no_proxy}}"
+  
+- name: Install docker Pre-Requisite 
+  pip:
+    name: "{{item.name}}"
+    state: latest
+    #version: "{{item.version}}"
+  with_items:
+    - { name: 'docker-py'}
+    #- { name: 'pyYAML'}
+    #- { name: 'docker-compose'}
+  environment:
+    http_proxy: "{{http_proxy}}"
+    https_proxy: "{{https_proxy}}" 
+    no_proxy: "{{no_proxy}}"
+  
+- name: "Install docker-ce for CentOS"
+  yum: 
+    name: docker-ce
+    state: present
+  environment:
+    http_proxy: "{{http_proxy}}"
+    https_proxy: "{{https_proxy}}" 
+    no_proxy: "{{no_proxy}}"
+  when:
+    ansible_distribution == "CentOS"
+    
+- name: "Install docker-ce for RHEL"
+  yum: 
+    name: docker-ce
+    state: present
+    enablerepo: rhel-7-server-extras-rpms
+  environment:
+    http_proxy: "{{http_proxy}}"
+    https_proxy: "{{https_proxy}}" 
+    no_proxy: "{{no_proxy}}"
+  when:
+    ansible_distribution == 'RedHat'
+    
+- name: Enable docker ports in firewalld
+  firewalld: port={{item.port}} permanent=true state=enabled
+  with_items:
+    - { port: 80/tcp }
+    - { port: 443/tcp }
+    - { port: 2375/tcp }
+    - { port: 2377/tcp }
+    - { port: 7946/tcp }
+    - { port: 7946/udp }
+    - { port: 4789/tcp }
+    - { port: 4789/udp }
+    - { port: 12201/udp } #graylog udp port
+    - { port: 9323/tcp } #docker metrics port
+    - { port: 8080/tcp } #cadvisor port
+  register: firewalld_op_ce

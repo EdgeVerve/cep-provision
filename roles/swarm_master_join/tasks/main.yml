@@ -4,8 +4,8 @@
   block:
    - shell: >
             docker swarm join
-            --token={{ hostvars[groups['swarm_manager_operational'][0]]['swarm_manager_token']['stdout'] }} --listen-addr=0.0.0.0:4000
-            {{ groups['swarm_manager_ips'][0] }}:4000
+            --token={{ hostvars[groups['swarm_manager_operational'][0]]['swarm_manager_token']['stdout'] }} --listen-addr=0.0.0.0:2377
+            {{ groups['swarm_manager_ips'][0] }}:2377
   rescue:
    - name: Join manager nodes failed
      fail: msg="Make sure if {{ groups['swarm_manager_ips'][0] }} along with all the node ips is in no_proxy[{{no_proxy}}] env if proxy is present"

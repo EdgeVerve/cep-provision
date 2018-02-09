@@ -17,8 +17,8 @@
          --mount target=/var/lib/grafana,source={{cepfolder}}/cep-data/grafana,type=bind
          -e FORCE_SSL=yes 
          -e SERVICE_PORTS="3000" 
-         -e VIRTUAL_HOST="https://grafana.{{domainname}},grafana.{{domainname}}" 
-         -e "GF_SERVER_ROOT_URL=https://grafana.{{domainname}}" 
+         -e VIRTUAL_HOST="https://cep-monitor.{{domainname}},cep-monitor.{{domainname}}" 
+         -e "GF_SERVER_ROOT_URL=https://cep-monitor.{{domainname}}" 
          -e "PROMETHEUS_ENDPOINT=http://prometheus-server:9090" 
          --constraint "node.hostname == $HOSTNAME"
          --network router_network 
@@ -32,8 +32,8 @@
          --mount target=/var/lib/grafana,source={{cepfolder}}/cep-data/grafana,type=bind
          -e FORCE_SSL=yes 
          -e SERVICE_PORTS="3000" 
-         -e VIRTUAL_HOST="https://grafana.{{domainname}},grafana.{{domainname}}" 
-         -e "GF_SERVER_ROOT_URL=https://grafana.{{domainname}}" 
+         -e VIRTUAL_HOST="https://cep-monitor.{{domainname}},cep-monitor.{{domainname}}" 
+         -e "GF_SERVER_ROOT_URL=https://cep-monitor.{{domainname}}" 
          -e "PROMETHEUS_ENDPOINT=http://prometheus-server:9090" 
          --network router_network 
          --name cep-grafana-server 

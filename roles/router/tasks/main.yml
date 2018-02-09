@@ -18,16 +18,12 @@
 - set_fact:
     cert_content: "{{ lookup('file', cert_file_path) }}"
   
-- name: spin router container
-  shell: >
-          docker service create  --detach=false --with-registry-auth 
-          --name cep_router 
-          --network router_network 
-          --mount target=/var/run/docker.sock,source=/var/run/docker.sock,type=bind 
-          -p 80:80 
-          -p 443:443  
-          --constraint "node.role == manager" 
-          -e DEFAULT_SSL_CERT="{{cert_content}}"
-          {{ router }}
-  when: existing_router_op.stdout == "0"
+- name: install router in docker-ce environment
+  include: router_docker_ce.yml
+  when: docker_ee_subscription == ""
+  
+- name: install router in docker-ce environment
+  include: router_docker_ee.yml
+  when: docker_ee_subscription != ""
+  
   

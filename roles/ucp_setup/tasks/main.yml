@@ -1,0 +1,78 @@
+#©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),Bangalore, India. All Rights Reserved.
+
+- name: Check if volume already present
+  shell: docker volume ls | grep ucp-controller-server-certs | wc -l
+  register: volume_op
+
+- name: Create volume for certificate to be used by ucp
+  shell: "docker volume create ucp-controller-server-certs"
+  when: volume_op.stdout == "0"
+
+- name: Copy certificates to the volume
+  shell: "cp {{item.src}} {{item.dest}}"
+  with_items:
+    -
+      dest: "{{cepfolder}}/cep/docker/volumes/ucp-controller-server-certs/_data/ca.pem"
+      src: "{{cepfolder}}/cep/certificates/ca.pem"
+    -
+      dest: "{{cepfolder}}/cep/docker/volumes/ucp-controller-server-certs/_data/cert.pem"
+      src: "{{cepfolder}}/cep/certificates/cert.pem"
+    -
+      dest: "{{cepfolder}}/cep/docker/volumes/ucp-controller-server-certs/_data/key.pem"
+      src: "{{cepfolder}}/cep/certificates/key.pem"
+
+- name: check if ucp is already running
+  shell: docker ps | grep ucp-controller | wc -l
+  register: existing_ucp_op
+
+- name: Check if backup file exists
+  stat:
+    path: "{{cepfolder}}/cep-data/ucp-backup.tar"
+  register: backup_result
+  when: existing_ucp_op.stdout == "0"
+  
+- name: Restore ucp if backup is present
+  shell: >
+           docker container run --rm -i 
+           --name ucp 
+           -v /var/run/docker.sock:/var/run/docker.sock  
+           {{ ucp }} 
+           restore < {{cepfolder}}/cep-data/ucp-backup.tar
+  when: existing_ucp_op.stdout == "0" and backup_result.stat.exists == True
+
+- name: install ucp
+  shell: >
+          docker container run --rm 
+          --name ucp 
+          -v /var/run/docker.sock:/var/run/docker.sock 
+          {{ ucp }}
+          install  --admin-username {{ucp_username}} --admin-password {{ucp_password}} --controller-port 4433 --external-server-cert
+  when: existing_ucp_op.stdout == "0" and ('swarm_manager_operational' not in groups) and (backup_result.stat.exists == False)
+  
+- name: add initialized host play_hosts[0] to swarm_manager_operational group
+  add_host:
+    hostname: "{{ play_hosts[0] }}"
+    ansible_ssh_host: "{{ hostvars[play_hosts[0]]['inventory_hostname'] }}"
+    ansible_ssh_user: "{{ hostvars[play_hosts[0]]['ansible_ssh_user'] }}"
+    ansible_ssh_pass: "{{ hostvars[play_hosts[0]]['ansible_ssh_pass'] }}"
+    ansible_become: "{{ hostvars[play_hosts[0]]['ansible_become'] }}"
+    ansible_become_method: "{{ hostvars[play_hosts[0]]['ansible_become_method'] }}"
+    ansible_become_pass: "{{ hostvars[play_hosts[0]]['ansible_become_pass'] }}"
+    groups: swarm_manager_operational   
+  when: "'swarm_manager_operational' not in groups"
+  
+- name: Make folder for backup shell script
+  file: path="{{cepfolder}}/cep/ucp-backup-script" state=directory
+
+- name: Copy required files
+  template: src={{item.src}} dest={{item.dest}} mode=u+x
+  with_items:
+    -
+      dest: "{{cepfolder}}/cep/ucp-backup-script/ucp-backup.sh"
+      src: "ucp-backup-script/ucp-backup.sh"
+
+- name: Adding crontab entry for cleanup
+  lineinfile:
+    line: "{{ucp_cron_timing}} {{ucp_cron_user}} {{cepfolder}}/cep/ucp-backup-script/ucp-backup.sh"
+    path: "{{crontab_file}}"
+    state: present

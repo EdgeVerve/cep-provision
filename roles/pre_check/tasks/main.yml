@@ -47,8 +47,7 @@
    - name: Check if node ip's are present in no_proxy if proxy is present
      fail:
      with_items:
-       - "{{  groups['manager'] }}"
-       - "{{  groups['worker'] }}" 
+       - "{{  groups['AllHosts'] }}"
      when: (http_proxy is defined and http_proxy != "") and (https_proxy is defined and https_proxy != "") and hostvars[item]['inventory_hostname'] not in no_proxy
      no_log: true 
    - name: Check if domain are present in no_proxy if proxy is present
